@@ -1,0 +1,44 @@
+{
+    // this is an hotfix when prettier does not work
+    // "prettier.prettierPath": "./node_modules/prettier",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": [
+        "source.organizeImports",
+        "source.fixAll.sortJSON",
+        "source.fixAll.eslint",
+        "source.formatDocument"
+    ],
+    "vs-code-prettier-eslint.prettierLast": true,
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "*.cfg.dev": "properties",
+        "*.cfg.prod": "properties",
+        "*.Dockerfile.dev": "Dockerfile",
+        "*.Dockerfile.prod": "Dockerfile",
+        "*.lua.dev": "lua",
+        "*.lua.prod": "lua"
+    },
+    "formatFiles.extensionsToInclude": "js,ts,jsx,tsx,json,vue,svg,scss,css,lua,sh,Dockerfile,html,Dockerfile.dev,Dockerfile.prod,yml,cfg",
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[dotenv]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    //"makefileCommandRunner.makefilePath": "/home/linuxbrew/.linuxbrew/bin/make",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[ignore]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[properties]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    }
+}

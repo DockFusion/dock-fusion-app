@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/img/small_logo_white_96x96.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta id="node-version" name="node-version" />
+    <meta id="chrome-version" name="chrome-version" />
+    <meta id="electron-version" name="electron-version" />
+    <title id="page_title"></title>
+
+    <style>
+        body {
+            overflow: hidden;
+        }
+
+        img {
+            -webkit-user-drag: none;
+        }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        *::-webkit-scrollbar,
+        *::-webkit-scrollbar-corner {
+            width: 12px !important;
+            height: 12px !important;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            min-height: 56px !important;
+            border-radius: 8px !important;
+            border: 3px solid transparent !important;
+            background-clip: content-box !important;
+            background-color: rgb(142, 137, 162) !important;
+        }
+
+        *::-webkit-scrollbar-thumb:vertical:hover,
+        *::-webkit-scrollbar-thumb:horizontal:hover {
+            background-color: rgb(126, 121, 143) !important;
+        }
+
+        *::-webkit-scrollbar-track {
+            background-color: transparent !important;
+            margin: -2px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root" style="user-select:none;"></div>
+</body>
+
+</html>

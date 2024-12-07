@@ -1,0 +1,48 @@
+{
+    "compilerOptions": {
+        "target": "ES2021", // Targeting modern JavaScript
+        "module": "CommonJS", // Electron uses CommonJS for modules
+        "strict": true, // Enables strict type-checking options
+        "moduleResolution": "node", // Electron uses Node.js style resolution
+        "esModuleInterop": true, // Allows default imports from commonjs modules
+        "skipLibCheck": true, // Skips type checking of declaration files
+        "forceConsistentCasingInFileNames": true, // Enforces consistent file naming
+        "allowSyntheticDefaultImports": true, // Allow default imports in CommonJS
+        "outDir": "../dist/electron", // Output directory for compiled files
+        "sourceMap": true, // Enables sourcemaps for easier debugging
+        "isolatedModules": false, // Electron often uses multi-module systems
+        "noEmitOnError": true, // Prevents emitting files if there are errors
+        "resolveJsonModule": true, // Allows importing JSON files
+        "jsx": "react", // If you're using React with Electron
+        "baseUrl": "../",
+        "rootDir": "../",
+        "lib": [
+            "dom",
+            "es2021"
+        ], // Includes browser (DOM) and modern JavaScript libraries
+        "types": [
+            "node",
+            "electron"
+        ], // Includes type definitions for Node.js and Electron
+        "paths": {
+            "shared/*": [
+                "src/shared/*"
+            ],
+            "src/*": [
+                "electron/*"
+            ]
+        },
+    },
+    "include": [
+        "../electron/**/*",
+        "../src/shared/**/*",
+        "main.ts"
+    ],
+    "exclude": [
+        "../dist",
+        "../node_modules",
+        "../coverage",
+        "../**/*.spec.ts"
+    ],
+    "compileOnSave": false,
+}

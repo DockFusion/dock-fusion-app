@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "foxundermoon.shell-format",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next"
+    ]
+}

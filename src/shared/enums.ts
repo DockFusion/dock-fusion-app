@@ -1,0 +1,62 @@
+export enum Editor {
+    VisualStudioCode = 'VisualStudioCode',
+    SublimeText = 'SublimeText',
+    Vim = 'Vim',
+    Nano = 'Nano',
+    Atom = 'Atom',
+    Brackets = 'Brackets',
+    Emacs = 'Emacs',
+    IntelliJ = 'IntelliJ',
+    WebStorm = 'WebStorm',
+    PyCharm = 'PyCharm',
+    CLion = 'CLion',
+    AndroidStudio = 'AndroidStudio',
+    Xcode = 'Xcode',
+    Eclipse = 'Eclipse',
+    NetBeans = 'NetBeans',
+    Komodo = 'Komodo',
+    NotepadPlusPlus = 'NotepadPlusPlus',
+    Gedit = 'Gedit',
+    Kate = 'Kate',
+    Bluefish = 'Bluefish',
+    Geany = 'Geany',
+    TextMate = 'TextMate',
+    LightTable = 'LightTable',
+    Jupyter = 'Jupyter',
+    Spacemacs = 'Spacemacs',
+    VSCodium = 'VSCodium',
+    CodeBlocks = 'CodeBlocks',
+    VisualStudio = 'VisualStudio',
+    XEmacs = 'XEmacs',
+    Pico = 'Pico',
+}
+
+export enum Shell {
+    Bash = 'Bash',
+    Zsh = 'Zsh',
+    Fish = 'Fish',
+    PowerShell = 'PowerShell',
+    Cmd = 'Cmd',
+    FishShell = 'FishShell',
+    Csh = 'Csh',
+    Tcsh = 'Tcsh',
+    Dash = 'Dash',
+    Elvish = 'Elvish',
+    Ion = 'Ion',
+    Xonsh = 'Xonsh',
+    Mksh = 'Mksh',
+    Ash = 'Ash',
+    Ksh = 'Ksh',
+    Fsh = 'Fsh',
+    BusyBoxSh = 'BusyBoxSh',
+    Nushell = 'Nushell',
+    PlainSh = 'PlainSh',
+    GitBash = 'GitBash',
+    AlacrittyShell = 'AlacrittyShell',
+    WSL = 'WSL', // Windows Subsystem for Linux
+    Termux = 'Termux', // on Android
+    UbuntuShell = 'UbuntuShell', // Ubuntu default shell
+    Cygwin = 'Cygwin', // Cygwin environment for Windows
+    Cmder = 'Cmder', // Cmder shell for Windows
+    WindowsTerminal = 'WindowsTerminal', // Windows Terminal
+}

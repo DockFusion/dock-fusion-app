@@ -1,0 +1,8 @@
+{
+    "letsGetStarted": "Let's get started",
+    "wslNotInstalled": "WSL 2 is not installed",
+    "deckInstallationDescription": "DECK will attempt to install a light-weight distribution for WSL for creating and managing development environment",
+    "wsl2RequiredDescription": "DECK requires WSL 2. It looks like you have not installed / enabled WSL 2, to install open command prompt in Administrator mode and run wsl --install",
+    "customUbuntuRequiredDescription": "DECK requires a custom distribution from Ubuntu to be installed. This helps to keep everything inside under a stable environment so you can keep working safely without the risk of compromising DECK environment.",
+    "dependenciesRequiredDescription": "DockFusion requires some dependencies to be installed like chocollatey to install some of the dependencies we need and mkcert to generate your app certificates"
+}

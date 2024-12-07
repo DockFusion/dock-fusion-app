@@ -1,0 +1,4 @@
+{
+    "watch": ["./electron/**/*", "./src/shared/**/*", "./main.ts"],
+    "ext": "ts,js,css,json"
+}
