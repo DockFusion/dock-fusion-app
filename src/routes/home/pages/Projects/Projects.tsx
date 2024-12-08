@@ -1,7 +1,7 @@
 import { Clear, Search } from '@mui/icons-material';
 import { Container, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
 import { Fragment, useEffect, useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { usePageLoaderContext } from 'src/components/PageLoader/usePageLoaderContext';
 import { getMarketplaceItems } from 'src/helpers/helpers';
 import { Self } from 'src/helpers/self';
@@ -12,6 +12,8 @@ export function Projects() {
     const { setLoaderVisible } = usePageLoaderContext();
     const [projectsList, setProjectsList] = useState<IProjectWithMarketPlace[]>([]);
     const [search, setSearch] = useState('');
+    const [inited, setInited] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         const marketplaceItems = getMarketplaceItems();
@@ -36,12 +38,19 @@ export function Projects() {
             })
             .finally(() => {
                 setLoaderVisible(false);
+                setInited(true);
             });
 
         return () => {
             setLoaderVisible(true);
         };
     }, []);
+
+    useEffect(() => {
+        if (inited && location.pathname === '/home/projects') {
+            setLoaderVisible(false);
+        }
+    }, [location]);
 
     return (
         <Stack direction={'row'} sx={{ height: '100%', width: '100%', maxWidth: 'calc(100vw - min(8vw, 70px))' }}>

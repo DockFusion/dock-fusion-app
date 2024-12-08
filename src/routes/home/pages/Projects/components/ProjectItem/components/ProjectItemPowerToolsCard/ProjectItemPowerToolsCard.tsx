@@ -11,13 +11,22 @@ enum ProjectFiles {
     NodeModules = 'node_modules',
     ComposerJson = 'composer.json',
     Vendor = 'vendor',
+    Artisan = 'artisan',
 }
 
 const ToolsPerProjectFile = {
     [ProjectFiles.PackageJson]: ['npm install', 'npm ci'],
-    [ProjectFiles.NodeModules]: ['npm install', 'npm update --save'],
-    [ProjectFiles.ComposerJson]: ['npm install'],
-    [ProjectFiles.Vendor]: ['npm install'],
+    [ProjectFiles.NodeModules]: ['npm run prod', 'npm run watch', 'npm update --save'],
+    [ProjectFiles.ComposerJson]: ['composer install'],
+    [ProjectFiles.Vendor]: ['composer update', 'composer dump-autoload', 'composer clear-cache'],
+    [ProjectFiles.Artisan]: [
+        'php artisan key:generate',
+        'php artisan migrate',
+        'php artisan db:seed',
+        'php artisan cache:clear',
+        'php artisan view:clear',
+        'php artisan config:clear',
+    ],
 };
 
 export function ProjectItemPowerToolsCard(props: Props) {

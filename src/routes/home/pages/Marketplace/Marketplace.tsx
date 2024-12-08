@@ -11,6 +11,7 @@ import { MarketplaceItem } from './components/MarketplaceItem/MarketplaceItem';
 export function Marketplace() {
     const { setLoaderVisible } = usePageLoaderContext();
     const [marketplaceItems, setMarketplaceItems] = useState<IMarketplaceItem[]>([]);
+    const [inited, setInited] = useState(false);
     const location = useLocation();
     const [search, setSearch] = useState('');
 
@@ -18,11 +19,18 @@ export function Marketplace() {
         setMarketplaceItems(getMarketplaceItems());
 
         setLoaderVisible(false);
+        setInited(true);
 
         return () => {
             setLoaderVisible(true);
         };
     }, []);
+
+    useEffect(() => {
+        if (inited && location.pathname === '/home/marketplace') {
+            setLoaderVisible(false);
+        }
+    }, [location]);
 
     return (
         <Stack direction={'row'} sx={{ height: '100%', width: '100%', maxWidth: 'calc(100vw - min(8vw, 70px))' }}>
