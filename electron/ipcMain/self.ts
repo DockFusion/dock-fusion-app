@@ -83,20 +83,17 @@ ipcMain.handle(
         const homePath = app.getPath('home');
         let dockFusionPath = path.join(homePath, homeAppDataFolderName);
         let appDataPath = path.join(dockFusionPath, 'apps');
+        let dataPath = path.join(dockFusionPath, 'data');
         let env: any = {};
         let systemEnv: any = {};
         let domain = '';
 
         for (const option of options) {
-            if (option.target) {
-                env[option.target] = option.value;
-            } else {
-                switch (option.type) {
-                    case 'domain':
-                        appDataPath = path.join(appDataPath, option.value);
-                        domain = option.value;
-                        break;
-                }
+            if (option.type === 'domain') {
+                appDataPath = path.join(appDataPath, option.value);
+                dataPath = path.join(dataPath, option.value);
+                domain = option.value;
+                break;
             }
         }
 
@@ -151,6 +148,7 @@ ipcMain.handle(
                 }
             }
         }
+        env.DATA_PATH_HOST = dataPath;
 
         env = {
             ...env,
@@ -454,9 +452,11 @@ ipcMain.handle('self.startProject', async function (_: any, project: IProject): 
         { cwd: appDataPath },
         (error, stdout, stderr) => {
             if (error) {
+                console.error(error);
                 return;
             }
             if (stderr) {
+                console.error(stderr);
                 return;
             }
         },
@@ -481,6 +481,27 @@ ipcMain.handle('self.stopProject', async function (_: any, project: IProject): P
         },
     );
 });
+
+ipcMain.handle(
+    'self.execCommandInProject',
+    async function (_: any, containerId: string, command: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            exec(`docker exec -i ${containerId} ${command}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(error);
+                    reject();
+                    return;
+                }
+                if (stderr) {
+                    console.error(stderr);
+                    reject();
+                    return;
+                }
+                resolve();
+            });
+        });
+    },
+);
 
 ipcMain.handle(
     'self.doesExistAtProject',

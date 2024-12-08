@@ -59,4 +59,7 @@ export const Self = {
     doesExistAtProject: async (project: IProject, targetPath: string) => {
         return await window.electron.self.doesExistAtProject(project, targetPath);
     },
+    execCommandInProject: async (containerId: string, command: string) => {
+        return await window.electron.self.execCommandInProject(containerId, command);
+    },
 };

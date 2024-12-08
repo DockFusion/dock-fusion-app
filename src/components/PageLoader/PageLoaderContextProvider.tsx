@@ -1,4 +1,5 @@
 import { Backdrop, Box, CircularProgress } from '@mui/material';
+import { SnackbarProvider } from 'notistack';
 import { createContext, Dispatch, SetStateAction, useState } from 'react';
 import { AlertDialog } from '../AlertDialog/AlertDialog';
 
@@ -20,13 +21,15 @@ export const PageLoaderContextProvider = (props: any) => {
                 setLoaderVisible,
             }}
         >
-            <Backdrop open={loaderVisible} mountOnEnter unmountOnExit>
-                <Box sx={{ display: 'flex' }}>
-                    <CircularProgress sx={{ color: 'white' }} />
-                </Box>
-            </Backdrop>
-            {props.children}
-            <AlertDialog />
+            <SnackbarProvider autoHideDuration={3000} maxSnack={3}>
+                <Backdrop open={loaderVisible} mountOnEnter unmountOnExit>
+                    <Box sx={{ display: 'flex' }}>
+                        <CircularProgress sx={{ color: 'white' }} />
+                    </Box>
+                </Backdrop>
+                {props.children}
+                <AlertDialog />
+            </SnackbarProvider>
         </PageLoaderContext.Provider>
     );
 };

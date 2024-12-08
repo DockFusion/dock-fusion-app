@@ -102,9 +102,13 @@ export function ProjectItemUserSettingsCard(props: Props) {
                 {formStructure.map((el, index) => {
                     return (
                         <CardInfo key={index} title={el.title}>
-                            <Tooltip placement='bottom' title={el.value}>
-                                <Typography noWrap>{el.value}</Typography>
-                            </Tooltip>
+                            <div style={{ minWidth: '50px', display: 'flex', justifyContent: 'flex-end' }}>
+                                <Tooltip placement='bottom' title={el.value}>
+                                    <Typography noWrap minWidth={'50px'}>
+                                        {el.value}
+                                    </Typography>
+                                </Tooltip>
+                            </div>
                         </CardInfo>
                     );
                 })}

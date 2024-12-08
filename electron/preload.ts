@@ -82,6 +82,8 @@ contextBridge.exposeInMainWorld('electron', {
         doesExist: async (targetPath: string) => await ipcRenderer.invoke('self.doesExist', targetPath),
         doesExistAtProject: async (project: IProject, targetPath: string) =>
             await ipcRenderer.invoke('self.doesExistAtProject', project, targetPath),
+        execCommandInProject: async (containerId: string, command: string) =>
+            await ipcRenderer.invoke('self.execCommandInProject', containerId, command),
     },
     github: {
         downloadMarketplaceFile: async (downloadUrl: string, github: string, filePath: string) =>

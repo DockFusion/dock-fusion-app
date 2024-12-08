@@ -1,5 +1,9 @@
-import { Card, ImageListItem, Stack, Typography } from '@mui/material';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Card, Divider, ImageListItem, Stack, Typography } from '@mui/material';
+import { enqueueSnackbar } from 'notistack';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { useAlertDialog } from 'src/components/AlertDialog/useAlertDialog';
+import { useDockerStatusTrackerContext } from 'src/components/DockerStatusTracker/useDockerStatusTrackerContext';
+import { ProjectStatus } from 'src/enums';
 import { Self } from 'src/helpers/self';
 
 interface Props {
@@ -13,6 +17,14 @@ enum ProjectFiles {
     Vendor = 'vendor',
     Artisan = 'artisan',
 }
+
+const ProjectFilesOrder = [
+    ProjectFiles.PackageJson,
+    ProjectFiles.NodeModules,
+    ProjectFiles.ComposerJson,
+    ProjectFiles.Vendor,
+    ProjectFiles.Artisan,
+];
 
 const ToolsPerProjectFile = {
     [ProjectFiles.PackageJson]: ['npm install', 'npm ci'],
@@ -36,16 +48,47 @@ export function ProjectItemPowerToolsCard(props: Props) {
     const showPowerTools = useMemo(() => {
         return Object.values(projectFiles).filter((el) => el).length > 0;
     }, [projectFiles]);
+    const { containerId, containerStatus } = useDockerStatusTrackerContext({ project: props.project });
+    const { alertDialogFire } = useAlertDialog();
 
     const availablePowerTools = useMemo(() => {
         let tools = {};
 
-        if (projectFiles[ProjectFiles.PackageJson]) {
-            // tools[ProjectFiles.PackageJson]
+        for (const key of Object.keys(projectFiles)) {
+            if (projectFiles[key]) {
+                tools[key] = ToolsPerProjectFile[key];
+            }
         }
 
         return tools;
     }, [projectFiles]);
+    const sortedAvailablePowerTools = useMemo(() => {
+        const powerTools = Object.keys(availablePowerTools).filter((key) =>
+            ProjectFilesOrder.includes(key as ProjectFiles),
+        );
+        let finalPowerTools = [];
+
+        for (const powerTool of ProjectFilesOrder) {
+            if (availablePowerTools[powerTool]) {
+                finalPowerTools.push({
+                    source: powerTool,
+                    tools: availablePowerTools[powerTool],
+                });
+            }
+        }
+
+        return finalPowerTools;
+    }, [availablePowerTools]);
+    const unsortedAvailablePowerTools = useMemo(() => {
+        return Object.keys(availablePowerTools)
+            .filter((key) => !ProjectFilesOrder.includes(key as ProjectFiles))
+            .map((powerTool) => {
+                return {
+                    source: powerTool,
+                    tools: availablePowerTools[powerTool],
+                };
+            });
+    }, [availablePowerTools]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -80,13 +123,71 @@ export function ProjectItemPowerToolsCard(props: Props) {
         return <></>;
     }
 
+    function powerToolButtons(buttons) {
+        return buttons.map((powerTool, index) => {
+            return (
+                <Fragment key={powerTool.source}>
+                    {index !== 0 && <Divider sx={{ my: 1 }} />}
+                    <Typography>{powerTool.source}</Typography>
+                    <Stack direction={'row'} gap={1} flexWrap={'wrap'}>
+                        {powerTool.tools.map((command) => {
+                            return (
+                                <Button
+                                    key={command}
+                                    sx={{ width: 'fit-content' }}
+                                    size='small'
+                                    onClick={() => {
+                                        const key = `${props.project.domain}|${command}`;
+                                        if (!sessionStorage.getItem(key)) {
+                                            sessionStorage.setItem(key, 'true');
+                                            Self.execCommandInProject(containerId, command)
+                                                .then(() => {
+                                                    enqueueSnackbar(
+                                                        `${command} completed with success at [${props.project.domain}]`,
+                                                        {
+                                                            variant: 'success',
+                                                        },
+                                                    );
+                                                })
+                                                .catch(() => {
+                                                    enqueueSnackbar(
+                                                        `${command} completed with errors at [${props.project.domain}]`,
+                                                        {
+                                                            variant: 'error',
+                                                        },
+                                                    );
+                                                })
+                                                .finally(() => {
+                                                    sessionStorage.removeItem(key);
+                                                });
+                                        } else {
+                                            //TODO: move this to another place in the code
+
+                                            enqueueSnackbar('Command running! wait until it ends!', {
+                                                variant: 'warning',
+                                            });
+                                        }
+                                    }}
+                                    disabled={containerStatus !== ProjectStatus.running}
+                                >
+                                    {command}
+                                </Button>
+                            );
+                        })}
+                    </Stack>
+                </Fragment>
+            );
+        });
+    }
+
     return (
         <ImageListItem>
             <Card sx={{ backgroundColor: '#252525', p: '5px', overflow: 'hidden' }}>
                 <Stack>
                     <Typography>Power tools</Typography>
                     <Typography>Run commands in the prject by clicking on the buttons</Typography>
-                    <Typography>TODO</Typography>
+                    {powerToolButtons(sortedAvailablePowerTools)}
+                    {powerToolButtons(unsortedAvailablePowerTools)}
                 </Stack>
             </Card>
         </ImageListItem>

@@ -13,9 +13,11 @@ export const useDockerStatusTrackerContext = (props?: Props) => {
     const project = useMemo(() => {
         return props.project ? `${dockerGroupName}-${props.project.domain}` : '';
     }, [props.project]);
+
     const containerStatus = useMemo(() => {
-        return context.containerStatus[project] ?? ProjectStatus.unknown;
+        return context.containerStatus[project]?.status ?? ProjectStatus.unknown;
     }, [context.containerStatus, project]);
+
     const containerStatusColor = useMemo<'success' | 'warning' | 'error' | 'disabled'>(() => {
         switch (containerStatus) {
             case ProjectStatus.running:
@@ -36,5 +38,9 @@ export const useDockerStatusTrackerContext = (props?: Props) => {
         }
     }, [containerStatus]);
 
-    return { containerStatus, containerStatusColor };
+    const containerId = useMemo(() => {
+        return context.containerStatus[project]?.id;
+    }, [context.containerStatus, project]);
+
+    return { containerId, containerStatus, containerStatusColor };
 };

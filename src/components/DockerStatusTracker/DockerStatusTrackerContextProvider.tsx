@@ -28,19 +28,23 @@ export const DockerStatusTrackerContextProvider = (props: any) => {
             for (const project of Object.keys(containersTracked.current)) {
                 const containers = containersTracked.current[project];
 
-                const containersTrackedArray: ProjectStatus[] = Object.values(containers);
+                const containersTrackedArray: { id: string; status: ProjectStatus }[] = Object.values(containers);
                 if (!containersTrackedArray.length) {
                     continue;
                 }
 
-                let currentStatus = containersTrackedArray[0];
-                let currentStatusIndex = ProjectStatusOrder.indexOf(containersTrackedArray[0]);
+                let currentContainerId = containersTrackedArray[0].id;
+                let currentStatus = containersTrackedArray[0].status;
+                let currentStatusIndex = ProjectStatusOrder.indexOf(containersTrackedArray[0].status);
                 for (const projectContainerStatus of containersTrackedArray) {
-                    if (ProjectStatusOrder.indexOf(projectContainerStatus) < currentStatusIndex) {
-                        currentStatus = projectContainerStatus;
+                    if (ProjectStatusOrder.indexOf(projectContainerStatus.status) < currentStatusIndex) {
+                        currentStatus = projectContainerStatus.status;
                     }
                 }
-                containerStatusRef.current[project] = currentStatus;
+                containerStatusRef.current[project] = {
+                    id: currentContainerId,
+                    status: currentStatus,
+                };
             }
             setContainerStatus({ ...containerStatusRef.current });
         }
@@ -54,13 +58,17 @@ export const DockerStatusTrackerContextProvider = (props: any) => {
 
             let containersTrackedStatus = {};
             for (const container of containers) {
+                const id = container.Id;
                 const project = container.Labels[projectKey];
                 const name = container.Names[0].slice(1);
 
                 if (containersTrackedStatus[project] == null) {
                     containersTrackedStatus[project] = {};
                 }
-                containersTrackedStatus[project][name] = getNewContainerStatus(container.State);
+                containersTrackedStatus[project][name] = {
+                    id: id,
+                    status: getNewContainerStatus(container.State),
+                };
             }
             containersTracked.current = containersTrackedStatus;
 
@@ -84,10 +92,13 @@ export const DockerStatusTrackerContextProvider = (props: any) => {
 
             Docker.inpectContainer(id).then(async (info) => {
                 if (info) {
-                    containersTracked.current[project][name] = getNewContainerStatus(info.State.Status);
+                    containersTracked.current[project][name] = {
+                        id: id,
+                        status: getNewContainerStatus(info.State.Status),
+                    };
                     refreshContainerStatus();
 
-                    if (containersTracked.current[project][name] !== originalStatus) {
+                    if (containersTracked.current[project][name].status !== originalStatus) {
                         clearInterval(containerStatusWaiterRef.current[project][name]);
                         containerStatusWaiterRef.current[project][name] = null;
                     }
@@ -115,6 +126,7 @@ export const DockerStatusTrackerContextProvider = (props: any) => {
             if (signal.aborted) {
                 return;
             }
+            const id = event.id;
             const project = event.attributes[projectKey];
             const name = event.name;
 
@@ -128,31 +140,40 @@ export const DockerStatusTrackerContextProvider = (props: any) => {
                 containersTracked.current[project] = {};
             }
 
-            const originalStatus = containersTracked.current[project][name] ?? ProjectStatus.unknown;
+            const originalStatus = containersTracked.current[project][name]?.status ?? ProjectStatus.unknown;
 
             if (event.action === 'kill') {
-                containersTracked.current[project][name] = ProjectStatus.stopping;
+                containersTracked.current[project][name] = {
+                    id: id,
+                    status: ProjectStatus.stopping,
+                };
                 refreshContainerStatus();
 
                 clearInterval(containerStatusWaiterRef.current[project][name]);
                 containerStatusWaiterRef.current[project][name] = null;
                 containerStatusWaiterProcessingRef.current[project][name] = false;
             } else if (event.action === 'create') {
-                containersTracked.current[project][name] = ProjectStatus.starting;
+                containersTracked.current[project][name] = {
+                    id: id,
+                    status: ProjectStatus.starting,
+                };
                 refreshContainerStatus();
 
                 clearInterval(containerStatusWaiterRef.current[project][name]);
                 containerStatusWaiterRef.current[project][name] = null;
                 containerStatusWaiterProcessingRef.current[project][name] = false;
             } else if (event.action === 'destroy') {
-                containersTracked.current[project][name] = ProjectStatus.unknown;
+                containersTracked.current[project][name] = {
+                    id: id,
+                    status: ProjectStatus.unknown,
+                };
                 refreshContainerStatus();
 
                 clearInterval(containerStatusWaiterRef.current[project][name]);
                 containerStatusWaiterRef.current[project][name] = null;
                 containerStatusWaiterProcessingRef.current[project][name] = false;
             } else {
-                setupContainerStatusWaiter(event.id, project, name, originalStatus);
+                setupContainerStatusWaiter(id, project, name, originalStatus);
             }
         };
         Api.on('docker-container-event', containerEventCB);
