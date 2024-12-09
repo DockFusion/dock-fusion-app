@@ -20,12 +20,15 @@ import {
     readYaml,
     saveJson,
     saveYaml,
+    sleep,
     writeEnvFile,
     writeToFile,
 } from '../utils';
 const getPort = require('get-ports');
 
 const docker = new Dockerode({});
+let currentStartPosition = 0;
+let processingPosition = 0;
 
 ipcMain.handle('self.restart', async function () {
     app.relaunch();
@@ -464,88 +467,99 @@ async function restartRouter() {
 ipcMain.handle(
     'self.startProject',
     async function (_: any, project: IProject, forceRebuild: boolean = false): Promise<void> {
-        await startRouter();
-
-        const homePath = app.getPath('home');
-        let dockFusionPath = path.join(homePath, homeAppDataFolderName);
-        let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
-        let dataPath = path.join(dockFusionPath, 'data', project.domain);
-
-        const settings: any = await readYaml(path.join(appDataPath, 'settings.yml'));
-        const dockerCompose: any = await readYaml(path.join(appDataPath, 'docker-compose.yml'));
-        const env = (await readEnvFile(path.join(appDataPath, '.env'))) ?? {};
-
-        env.DATA_PATH_HOST = dataPath;
-
-        //setup fresh free ports
-        let freePort = 7999;
-        if (settings.system.ports.http) {
-            freePort = (await getPortAsync([++freePort]))[0];
-            env[settings.system.ports.http] = freePort.toString();
+        const position = currentStartPosition;
+        currentStartPosition++;
+        while (processingPosition < position) {
+            await sleep(500);
         }
-        for (const target of settings.system.ports.others ?? []) {
-            freePort = (await getPortAsync([++freePort]))[0];
-            env[target] = freePort.toString();
-        }
+        try {
+            await startRouter();
 
-        await writeEnvFile(path.join(appDataPath, '.env'), env);
+            const homePath = app.getPath('home');
+            let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+            let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+            let dataPath = path.join(dockFusionPath, 'data', project.domain);
 
-        let httpPort: number | undefined = undefined;
-        let httpServiceName: string | undefined = undefined;
-        if (settings.system.ports.http) {
-            for (const serviceName of Object.keys(dockerCompose.services)) {
-                const service = dockerCompose.services[serviceName];
+            const settings: any = await readYaml(path.join(appDataPath, 'settings.yml'));
+            const dockerCompose: any = await readYaml(path.join(appDataPath, 'docker-compose.yml'));
+            const env = (await readEnvFile(path.join(appDataPath, '.env'))) ?? {};
 
-                let httpPortFound = false;
-                for (let i = 0; i < (service.ports ?? []).length; ++i) {
-                    if (service.ports[i].includes(settings.system.ports.http)) {
-                        httpPortFound = true;
-                        httpServiceName = serviceName;
-                        const ports = service.ports[i].split(':');
-                        httpPort = Number(ports[ports.length - 1]);
+            env.DATA_PATH_HOST = dataPath;
+
+            //setup fresh free ports
+            let freePort = 7999;
+            if (settings.system.ports.http) {
+                freePort = (await getPortAsync([++freePort]))[0];
+                env[settings.system.ports.http] = freePort.toString();
+            }
+            for (const target of settings.system.ports.others ?? []) {
+                freePort = (await getPortAsync([++freePort]))[0];
+                env[target] = freePort.toString();
+            }
+
+            await writeEnvFile(path.join(appDataPath, '.env'), env);
+
+            let httpPort: number | undefined = undefined;
+            let httpServiceName: string | undefined = undefined;
+            if (settings.system.ports.http) {
+                for (const serviceName of Object.keys(dockerCompose.services)) {
+                    const service = dockerCompose.services[serviceName];
+
+                    let httpPortFound = false;
+                    for (let i = 0; i < (service.ports ?? []).length; ++i) {
+                        if (service.ports[i].includes(settings.system.ports.http)) {
+                            httpPortFound = true;
+                            httpServiceName = serviceName;
+                            const ports = service.ports[i].split(':');
+                            httpPort = Number(ports[ports.length - 1]);
+                            break;
+                        }
+                    }
+                    if (httpPortFound) {
                         break;
                     }
                 }
-                if (httpPortFound) {
-                    break;
-                }
             }
-        }
 
-        const dockerComposeOverride = await getDockerComposeOverrideSettings(
-            project.domain,
-            httpServiceName,
-            [],
-            httpPort,
-        );
-        await saveYaml(path.join(appDataPath, 'docker-compose.override.yml'), dockerComposeOverride);
-
-        await restartRouter();
-
-        const needRebuild = await doesExist(path.join(appDataPath, 'needRebuild'));
-        if (needRebuild) {
-            fs.rmSync(path.join(appDataPath, 'needRebuild'));
-        }
-
-        return new Promise((resolve, reject) => {
-            exec(
-                `docker compose -p ${dockerGroupName}-${project.domain} up ${forceRebuild || needRebuild ? ' --build' : ''} -d`,
-                { cwd: appDataPath },
-                (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(error);
-                        reject(error);
-                        return;
-                    }
-                    if (stderr) {
-                        console.error(stderr);
-                        resolve();
-                        return;
-                    }
-                    resolve();
-                },
+            const dockerComposeOverride = await getDockerComposeOverrideSettings(
+                project.domain,
+                httpServiceName,
+                [],
+                httpPort,
             );
-        });
+            await saveYaml(path.join(appDataPath, 'docker-compose.override.yml'), dockerComposeOverride);
+
+            await restartRouter();
+
+            const needRebuild = await doesExist(path.join(appDataPath, 'needRebuild'));
+            if (needRebuild) {
+                fs.rmSync(path.join(appDataPath, 'needRebuild'));
+            }
+
+            processingPosition++;
+            return new Promise((resolve, reject) => {
+                exec(
+                    `docker compose -p ${dockerGroupName}-${project.domain} up ${forceRebuild || needRebuild ? ' --build' : ''} -d`,
+                    { cwd: appDataPath },
+                    (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(error);
+                            reject(error);
+                            return;
+                        }
+                        if (stderr) {
+                            console.error(stderr);
+                            resolve();
+                            return;
+                        }
+                        resolve();
+                    },
+                );
+            });
+        } catch (e) {
+            processingPosition++;
+            throw e;
+        }
     },
 );
 
