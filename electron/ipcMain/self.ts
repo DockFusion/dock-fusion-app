@@ -210,6 +210,24 @@ ipcMain.handle('self.updateApp', async function (_: any, project: IProject): Pro
     return true;
 });
 
+ipcMain.handle('self.removeApp', async function (_: any, project: IProject): Promise<string | boolean> {
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+
+    let projects: IProject[] = [];
+    try {
+        projects = await readJson(path.join(dockFusionPath, 'projects.json'));
+    } catch (e) {}
+
+    projects = projects.filter((el) => el.domain !== project.domain);
+    await saveJson(path.join(dockFusionPath, 'projects.json'), projects);
+
+    fs.rmSync(appDataPath, { recursive: true, force: true });
+
+    return true;
+});
+
 ipcMain.handle('self.getProjectsList', async function (_: any): Promise<IProject[]> {
     const homePath = app.getPath('home');
     let dockFusionPath = path.join(homePath, homeAppDataFolderName);

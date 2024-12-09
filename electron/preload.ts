@@ -86,6 +86,7 @@ contextBridge.exposeInMainWorld('electron', {
         execCommandInProject: async (containerId: string, command: string) =>
             await ipcRenderer.invoke('self.execCommandInProject', containerId, command),
         updateApp: async (project: IProject) => await ipcRenderer.invoke('self.updateApp', project),
+        removeApp: async (project: IProject) => await ipcRenderer.invoke('self.removeApp', project),
     },
     github: {
         downloadMarketplaceFile: async (downloadUrl: string, github: string, filePath: string) =>

@@ -3,44 +3,20 @@ import { Container, IconButton, InputAdornment, Stack, TextField, Typography } f
 import { Fragment, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { usePageLoaderContext } from 'src/components/PageLoader/usePageLoaderContext';
-import { getMarketplaceItems } from 'src/helpers/helpers';
-import { Self } from 'src/helpers/self';
+import { useProjectsContext } from 'src/components/ProjectsProvider/useProjectsContext';
 import { ProjectItem } from './components/ProjectItem/ProjectItem';
 import { ProjectsButton } from './components/ProjectsButton/ProjectsButton';
 
 export function Projects() {
     const { setLoaderVisible } = usePageLoaderContext();
-    const [projectsList, setProjectsList] = useState<IProjectWithMarketPlace[]>([]);
     const [search, setSearch] = useState('');
     const [inited, setInited] = useState(false);
     const location = useLocation();
+    const { projects } = useProjectsContext();
 
     useEffect(() => {
-        const marketplaceItems = getMarketplaceItems();
-
-        const mappedMarketplaceItems = {};
-        for (const marketplaceItem of marketplaceItems) {
-            mappedMarketplaceItems[marketplaceItem.id] = marketplaceItem;
-        }
-
-        Self.getProjectsList()
-            .then((projects) => {
-                setProjectsList(
-                    projects.map((project) => {
-                        const cleanName = project.domain.replaceAll('-', ' ');
-                        return {
-                            ...project,
-                            name: `${cleanName.charAt(0).toUpperCase()}${cleanName.slice(1)}`,
-                            marketplaceItem: mappedMarketplaceItems[project.appId],
-                        };
-                    }),
-                );
-            })
-            .finally(() => {
-                setLoaderVisible(false);
-                setInited(true);
-            });
-
+        setLoaderVisible(false);
+        setInited(true);
         return () => {
             setLoaderVisible(true);
         };
@@ -85,7 +61,7 @@ export function Projects() {
                         }}
                     />
                     <Stack gap='6px' sx={{ px: '10px', overflowY: 'auto', flex: 1 }}>
-                        {projectsList.map((project) => {
+                        {projects.map((project) => {
                             if (project.name.toLowerCase().includes(search.toLowerCase())) {
                                 return <ProjectsButton key={project.domain} project={project} />;
                             }
@@ -105,7 +81,7 @@ export function Projects() {
             >
                 <Routes>
                     <Route path='/' element={<Typography>Select an project from the left</Typography>} />
-                    <Route path='/:projectDomain/*' element={<ProjectItem projects={projectsList} />} />
+                    <Route path='/:projectDomain/*' element={<ProjectItem projects={projects} />} />
                     <Route path='/*' element={<Navigate to='/home/marketplace' replace />} />
                 </Routes>
             </Container>

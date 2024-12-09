@@ -12,6 +12,7 @@ import { DockerStatusTrackerContextProvider } from './components/DockerStatusTra
 import { DynamicStrictMode } from './components/DynamicStrictMode/DynamicStrictMode';
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
 import { PageLoaderContextProvider } from './components/PageLoader/PageLoaderContextProvider';
+import { ProjectsContextProvider } from './components/ProjectsProvider/ProjectsContextProvider';
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
@@ -21,13 +22,15 @@ root.render(
             <StyledEngineProvider>
                 <ErrorBoundary>
                     <DockerStatusTrackerContextProvider>
-                        <BrowserRouter>
-                            <PageLoaderContextProvider>
-                                <Routes>
-                                    <Route path='/*' element={<SubRoutes />} />
-                                </Routes>
-                            </PageLoaderContextProvider>
-                        </BrowserRouter>
+                        <ProjectsContextProvider>
+                            <BrowserRouter>
+                                <PageLoaderContextProvider>
+                                    <Routes>
+                                        <Route path='/*' element={<SubRoutes />} />
+                                    </Routes>
+                                </PageLoaderContextProvider>
+                            </BrowserRouter>
+                        </ProjectsContextProvider>
                     </DockerStatusTrackerContextProvider>
                 </ErrorBoundary>
             </StyledEngineProvider>

@@ -65,4 +65,7 @@ export const Self = {
     updateApp: async (project: IProject) => {
         return await window.electron.self.updateApp(project);
     },
+    removeApp: async (project: IProject) => {
+        return await window.electron.self.removeApp(project);
+    },
 };

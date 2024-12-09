@@ -1,7 +1,10 @@
 import { Download } from '@mui/icons-material';
 import { Button, CircularProgress, Stack, Typography } from '@mui/material';
+import { enqueueSnackbar } from 'notistack';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePageLoaderContext } from 'src/components/PageLoader/usePageLoaderContext';
+import { useProjectsContext } from 'src/components/ProjectsProvider/useProjectsContext';
 import { downloadSourceFileFromGithubByImage } from 'src/helpers/github';
 import { Self } from 'src/helpers/self';
 import { IMarketplaceItem } from 'src/shared/interfaces';
@@ -40,6 +43,8 @@ export function MarketplaceItemInstall(props: Props) {
     const formStructureRef = useRef(formStructure);
     formStructureRef.current = formStructure;
     const { setLoaderVisible } = usePageLoaderContext();
+    const navigate = useNavigate();
+    const { refreshProjects } = useProjectsContext();
 
     useEffect(() => {
         let formStructure = [];
@@ -116,10 +121,15 @@ export function MarketplaceItemInstall(props: Props) {
         let newformStructure = [...formStructure];
 
         let containsErrors = false;
+        let domain = null;
         for (let i = 0; i < newformStructure.length; ++i) {
             const structure = newformStructure[i];
 
             switch (structure.type) {
+                case 'domain':
+                    domain = structure.value;
+                    break;
+
                 case 'checkbox':
                 case 'switch':
                     break;
@@ -166,9 +176,27 @@ export function MarketplaceItemInstall(props: Props) {
 
         downloadSourceFileFromGithubByImage(props.marketplaceItem)
             .then(async (file) => {
-                Self.installApp(newformStructure, props.marketplaceItem);
+                enqueueSnackbar(`Installing new ${props.marketplaceItem.name} app...`, {
+                    variant: 'info',
+                });
+                Self.installApp(newformStructure, props.marketplaceItem)
+                    .then(() => {
+                        enqueueSnackbar(`New ${props.marketplaceItem.name} app installed with success.`, {
+                            variant: 'success',
+                        });
+                        refreshProjects().then(() => {
+                            navigate(`/home/projects/${domain}`);
+                        });
+                    })
+                    .catch(() => {
+                        enqueueSnackbar(`Couldn't install the new ${props.marketplaceItem.name} app with success!`, {
+                            variant: 'error',
+                            autoHideDuration: 8000,
+                        });
+                        setLoaderVisible(false);
+                    });
             })
-            .finally(() => {
+            .catch(() => {
                 setLoaderVisible(false);
             });
     }

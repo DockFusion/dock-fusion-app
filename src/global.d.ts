@@ -112,6 +112,7 @@ declare global {
                 doesExistAtProject: (project: IProject, targetPath: string) => Promise<boolean>;
                 execCommandInProject: (containerId: string, command: string) => Promise<void>;
                 updateApp: (project: IProject) => Promise<void>;
+                removeApp: (project: IProject) => Promise<void>;
             };
             github: {
                 downloadMarketplaceFile: (downloadUrl: string, github: string, filePath: string) => Promise<string>;

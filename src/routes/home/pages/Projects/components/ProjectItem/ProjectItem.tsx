@@ -1,5 +1,6 @@
 import {
     Circle,
+    Delete,
     KeyboardDoubleArrowLeft,
     KeyboardDoubleArrowRight,
     PlayArrow,
@@ -25,6 +26,7 @@ import {
     Toolbar,
     Tooltip,
     Typography,
+    useTheme,
 } from '@mui/material';
 import jsyaml from 'js-yaml';
 import { enqueueSnackbar } from 'notistack';
@@ -34,6 +36,7 @@ import noImage from 'src/assets/img/no_image.jpg';
 import { useAlertDialog } from 'src/components/AlertDialog/useAlertDialog';
 import { useDockerStatusTrackerContext } from 'src/components/DockerStatusTracker/useDockerStatusTrackerContext';
 import { usePageLoaderContext } from 'src/components/PageLoader/usePageLoaderContext';
+import { useProjectsContext } from 'src/components/ProjectsProvider/useProjectsContext';
 import { ProjectStatus } from 'src/enums';
 import {
     downloadSourceFileFromGithubByImage,
@@ -71,6 +74,8 @@ export function ProjectItem(props: Props) {
     const containerStatusRef = useRef(containerStatus);
     containerStatusRef.current = containerStatus;
     const { alertDialogFire } = useAlertDialog();
+    const { refreshProjects } = useProjectsContext();
+    const muiTheme = useTheme();
 
     useEffect(() => {
         if (project == null) {
@@ -449,6 +454,96 @@ export function ProjectItem(props: Props) {
                                                 )}
                                             </ListItemIcon>
                                             <ListItemText primary={'Rebuild app'} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                    <ListItem disablePadding>
+                                        <ListItemButton
+                                            sx={{ backgroundColor: muiTheme.palette.error.main }}
+                                            onClick={() => {
+                                                alertDialogFire({
+                                                    title: `Remove ${project.name}`,
+                                                    text: `Are you sure you want to remove this app?`,
+                                                    icon: 'question',
+                                                    confirmButtonCb: async () => {
+                                                        setLoaderVisible(true);
+                                                        const key = `${project.domain}|remove app`;
+                                                        if (!sessionStorage.getItem(key)) {
+                                                            sessionStorage.setItem(key, 'true');
+
+                                                            enqueueSnackbar(`[${project.name}] removing...`, {
+                                                                variant: 'info',
+                                                            });
+                                                            try {
+                                                                if (
+                                                                    containerStatusRef.current !== ProjectStatus.unknown
+                                                                ) {
+                                                                    setContainerStatusByProject(
+                                                                        project.domain,
+                                                                        ProjectStatus.stopping,
+                                                                    );
+                                                                    await Self.stopProject(project);
+                                                                    while (
+                                                                        containerStatusRef.current !==
+                                                                        ProjectStatus.unknown
+                                                                    ) {
+                                                                        await sleep(500);
+                                                                    }
+                                                                }
+                                                                Self.removeApp(project)
+                                                                    .then(() => {
+                                                                        enqueueSnackbar(
+                                                                            `The app [${project.name}] was removed with success.`,
+                                                                            {
+                                                                                variant: 'success',
+                                                                            },
+                                                                        );
+                                                                        refreshProjects();
+                                                                        navigate('/home/projects');
+                                                                    })
+                                                                    .catch(() => {
+                                                                        enqueueSnackbar(
+                                                                            `Couldn't complete the removal of the app [${project.name}] with success!`,
+                                                                            {
+                                                                                variant: 'error',
+                                                                                autoHideDuration: 8000,
+                                                                            },
+                                                                        );
+                                                                    })
+                                                                    .finally(() => {
+                                                                        sessionStorage.removeItem(key);
+                                                                        setLoaderVisible(false);
+                                                                    });
+                                                            } catch (e) {
+                                                                enqueueSnackbar(
+                                                                    `Couldn't stop app [${project.name}] Please stop if manually before updating!`,
+                                                                    {
+                                                                        variant: 'error',
+                                                                        autoHideDuration: 8000,
+                                                                    },
+                                                                );
+                                                                sessionStorage.removeItem(key);
+                                                            }
+                                                        } else {
+                                                            enqueueSnackbar(
+                                                                `The app [${project.name}] is already being removed. please wait!`,
+                                                                {
+                                                                    variant: 'warning',
+                                                                },
+                                                            );
+                                                            setLoaderVisible(false);
+                                                        }
+                                                    },
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Yes',
+                                                    cancelButtonText: 'No',
+                                                    cancelButtonColor: 'error',
+                                                });
+                                            }}
+                                        >
+                                            <ListItemIcon>
+                                                <Delete />
+                                            </ListItemIcon>
+                                            <ListItemText primary={'Remove app'} />
                                         </ListItemButton>
                                     </ListItem>
                                 </List>
