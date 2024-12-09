@@ -521,3 +521,15 @@ export async function doesExist(targetPath: string): Promise<boolean> {
     });
     return await result;
 }
+
+export async function writeToFile(text: string, path: string) {
+    return new Promise<boolean>((resolve, reject) => {
+        fs.writeFile(path, text, 'utf8', (err) => {
+            if (err) {
+                resolve(false);
+                return;
+            }
+            resolve(true);
+        });
+    });
+}

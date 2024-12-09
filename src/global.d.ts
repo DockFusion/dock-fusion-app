@@ -106,11 +106,12 @@ declare global {
                 getSettingsByProject: (project: IProject) => Promise<any>;
                 getEnvironmentByProject: (project: IProject) => Promise<any>;
                 readProjectFile: (project: IProject, filePath: string) => Promise<any>;
-                startProject: (project: IProject) => Promise<void>;
+                startProject: (project: IProject, forceRebuild?: boolean) => Promise<void>;
                 stopProject: (project: IProject) => Promise<void>;
                 doesExist: (targetPath: string) => Promise<boolean>;
                 doesExistAtProject: (project: IProject, targetPath: string) => Promise<boolean>;
                 execCommandInProject: (containerId: string, command: string) => Promise<void>;
+                updateApp: (project: IProject) => Promise<void>;
             };
             github: {
                 downloadMarketplaceFile: (downloadUrl: string, github: string, filePath: string) => Promise<string>;

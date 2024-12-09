@@ -20,6 +20,7 @@ import {
     saveJson,
     saveYaml,
     writeEnvFile,
+    writeToFile,
 } from '../utils';
 const getPort = require('get-ports');
 
@@ -116,8 +117,10 @@ ipcMain.handle(
 
         const githubProjectLocalPath = path.join(app.getPath('userData'), 'githubDownloads', marketplaceItem.github);
         const githubFileLocalPath = path.join(githubProjectLocalPath, 'source.zip');
+        const githubVersionFileLocalPath = path.join(githubProjectLocalPath, 'version');
 
         const sourceZipFile = path.join(appDataPath, 'source.zip');
+        const versionFile = path.join(appDataPath, 'version');
         //make sure it is a clean installation
         fs.rmSync(appDataPath, { recursive: true, force: true });
         fs.mkdirSync(appDataPath, { recursive: true });
@@ -129,6 +132,7 @@ ipcMain.handle(
 
         moveContentsAndRemoveFolder(path.join(appDataPath, listFolders(appDataPath)[0]), appDataPath);
 
+        fs.copyFileSync(githubVersionFileLocalPath, versionFile);
         env = readEnvFile(path.join(appDataPath, '.env'));
         for (const option of options) {
             if (option.target) {
@@ -162,6 +166,49 @@ ipcMain.handle(
         return true;
     },
 );
+
+ipcMain.handle('self.updateApp', async function (_: any, project: IProject): Promise<string | boolean> {
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+    let appUpdateBackupPath = path.join(dockFusionPath, 'update-backup', project.domain);
+    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+    let env: any = readEnvFile(path.join(appDataPath, '.env'));
+
+    fs.mkdirSync(path.join(dockFusionPath, 'update-backup'), { recursive: true });
+    fs.rmSync(appUpdateBackupPath, { recursive: true, force: true });
+    fs.renameSync(appDataPath, appUpdateBackupPath);
+
+    try {
+        const githubProjectLocalPath = path.join(app.getPath('userData'), 'githubDownloads', project.github);
+        const githubFileLocalPath = path.join(githubProjectLocalPath, 'source.zip');
+        const githubVersionFileLocalPath = path.join(githubProjectLocalPath, 'version');
+
+        const sourceZipFile = path.join(appDataPath, 'source.zip');
+        const versionFile = path.join(appDataPath, 'version');
+        //make sure it is a clean installation
+        fs.rmSync(appDataPath, { recursive: true, force: true });
+        fs.mkdirSync(appDataPath, { recursive: true });
+        fs.copyFileSync(githubFileLocalPath, sourceZipFile);
+
+        decompressZip(sourceZipFile, appDataPath);
+
+        fs.rmSync(sourceZipFile, { force: true });
+
+        moveContentsAndRemoveFolder(path.join(appDataPath, listFolders(appDataPath)[0]), appDataPath);
+
+        fs.copyFileSync(githubVersionFileLocalPath, versionFile);
+        writeEnvFile(path.join(appDataPath, '.env'), env);
+        await writeToFile('just an empty file :)', path.join(appDataPath, 'needRebuild'));
+        fs.rmSync(appUpdateBackupPath, { recursive: true, force: true });
+    } catch (e) {
+        console.error(e);
+        // revert changes
+        fs.rmSync(appDataPath, { recursive: true, force: true });
+        fs.renameSync(appUpdateBackupPath, appDataPath);
+    }
+
+    return true;
+});
 
 ipcMain.handle('self.getProjectsList', async function (_: any): Promise<IProject[]> {
     const homePath = app.getPath('home');
@@ -393,93 +440,116 @@ async function restartRouter() {
     });
 }
 
-ipcMain.handle('self.startProject', async function (_: any, project: IProject): Promise<void> {
-    await startRouter();
+ipcMain.handle(
+    'self.startProject',
+    async function (_: any, project: IProject, forceRebuild: boolean = false): Promise<void> {
+        await startRouter();
 
-    const homePath = app.getPath('home');
-    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
-    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
-    let dataPath = path.join(dockFusionPath, 'data', project.domain);
+        const homePath = app.getPath('home');
+        let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+        let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+        let dataPath = path.join(dockFusionPath, 'data', project.domain);
 
-    const settings: any = await readYaml(path.join(appDataPath, 'settings.yml'));
-    const dockerCompose: any = await readYaml(path.join(appDataPath, 'docker-compose.yml'));
-    const env = (await readEnvFile(path.join(appDataPath, '.env'))) ?? {};
+        const settings: any = await readYaml(path.join(appDataPath, 'settings.yml'));
+        const dockerCompose: any = await readYaml(path.join(appDataPath, 'docker-compose.yml'));
+        const env = (await readEnvFile(path.join(appDataPath, '.env'))) ?? {};
 
-    env.DATA_PATH_HOST = dataPath;
+        env.DATA_PATH_HOST = dataPath;
 
-    //setup fresh free ports
-    let freePort = 7999;
-    if (settings.system.ports.http) {
-        freePort = (await getPortAsync([++freePort]))[0];
-        env[settings.system.ports.http] = freePort.toString();
-    }
-    for (const target of settings.system.ports.others ?? []) {
-        freePort = (await getPortAsync([++freePort]))[0];
-        env[target] = freePort.toString();
-    }
+        //setup fresh free ports
+        let freePort = 7999;
+        if (settings.system.ports.http) {
+            freePort = (await getPortAsync([++freePort]))[0];
+            env[settings.system.ports.http] = freePort.toString();
+        }
+        for (const target of settings.system.ports.others ?? []) {
+            freePort = (await getPortAsync([++freePort]))[0];
+            env[target] = freePort.toString();
+        }
 
-    await writeEnvFile(path.join(appDataPath, '.env'), env);
+        await writeEnvFile(path.join(appDataPath, '.env'), env);
 
-    let httpPort: number | undefined = undefined;
-    let httpServiceName: string | undefined = undefined;
-    if (settings.system.ports.http) {
-        for (const serviceName of Object.keys(dockerCompose.services)) {
-            const service = dockerCompose.services[serviceName];
+        let httpPort: number | undefined = undefined;
+        let httpServiceName: string | undefined = undefined;
+        if (settings.system.ports.http) {
+            for (const serviceName of Object.keys(dockerCompose.services)) {
+                const service = dockerCompose.services[serviceName];
 
-            let httpPortFound = false;
-            for (let i = 0; i < (service.ports ?? []).length; ++i) {
-                if (service.ports[i].includes(settings.system.ports.http)) {
-                    httpPortFound = true;
-                    httpServiceName = serviceName;
-                    const ports = service.ports[i].split(':');
-                    httpPort = Number(ports[ports.length - 1]);
+                let httpPortFound = false;
+                for (let i = 0; i < (service.ports ?? []).length; ++i) {
+                    if (service.ports[i].includes(settings.system.ports.http)) {
+                        httpPortFound = true;
+                        httpServiceName = serviceName;
+                        const ports = service.ports[i].split(':');
+                        httpPort = Number(ports[ports.length - 1]);
+                        break;
+                    }
+                }
+                if (httpPortFound) {
                     break;
                 }
             }
-            if (httpPortFound) {
-                break;
-            }
         }
-    }
 
-    const dockerComposeOverride = await getDockerComposeOverrideSettings(project.domain, httpServiceName, [], httpPort);
-    await saveYaml(path.join(appDataPath, 'docker-compose.override.yml'), dockerComposeOverride);
+        const dockerComposeOverride = await getDockerComposeOverrideSettings(
+            project.domain,
+            httpServiceName,
+            [],
+            httpPort,
+        );
+        await saveYaml(path.join(appDataPath, 'docker-compose.override.yml'), dockerComposeOverride);
 
-    await restartRouter();
+        await restartRouter();
 
-    exec(
-        `docker compose -p ${dockerGroupName}-${project.domain} up -d`,
-        { cwd: appDataPath },
-        (error, stdout, stderr) => {
-            if (error) {
-                console.error(error);
-                return;
-            }
-            if (stderr) {
-                console.error(stderr);
-                return;
-            }
-        },
-    );
-});
+        const needRebuild = await doesExist(path.join(appDataPath, 'needRebuild'));
+        if (needRebuild) {
+            fs.rmSync(path.join(appDataPath, 'needRebuild'));
+        }
+
+        return new Promise((resolve, reject) => {
+            exec(
+                `docker compose -p ${dockerGroupName}-${project.domain} up ${forceRebuild || needRebuild ? ' --build' : ''} -d`,
+                { cwd: appDataPath },
+                (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(error);
+                        reject(error);
+                        return;
+                    }
+                    if (stderr) {
+                        console.error(stderr);
+                        resolve();
+                        return;
+                    }
+                    resolve();
+                },
+            );
+        });
+    },
+);
 
 ipcMain.handle('self.stopProject', async function (_: any, project: IProject): Promise<void> {
     const homePath = app.getPath('home');
     let dockFusionPath = path.join(homePath, homeAppDataFolderName);
     let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
 
-    exec(
-        `docker compose -p ${dockerGroupName}-${project.domain} down`,
-        { cwd: appDataPath },
-        (error, stdout, stderr) => {
-            if (error) {
-                return;
-            }
-            if (stderr) {
-                return;
-            }
-        },
-    );
+    return new Promise((resolve, reject) => {
+        exec(
+            `docker compose -p ${dockerGroupName}-${project.domain} down`,
+            { cwd: appDataPath },
+            (error, stdout, stderr) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                if (stderr) {
+                    resolve();
+                    return;
+                }
+                resolve();
+            },
+        );
+    });
 });
 
 ipcMain.handle(
@@ -489,12 +559,12 @@ ipcMain.handle(
             exec(`docker exec -i ${containerId} ${command}`, (error, stdout, stderr) => {
                 if (error) {
                     console.error(error);
-                    reject();
+                    reject(error);
                     return;
                 }
                 if (stderr) {
                     console.error(stderr);
-                    reject();
+                    resolve();
                     return;
                 }
                 resolve();

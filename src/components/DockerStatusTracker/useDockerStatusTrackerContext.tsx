@@ -42,5 +42,10 @@ export const useDockerStatusTrackerContext = (props?: Props) => {
         return context.containerStatus[project]?.id;
     }, [context.containerStatus, project]);
 
-    return { containerId, containerStatus, containerStatusColor };
+    return {
+        containerId,
+        containerStatus,
+        containerStatusColor,
+        setContainerStatusByProject: context.setContainerStatusByProject,
+    };
 };

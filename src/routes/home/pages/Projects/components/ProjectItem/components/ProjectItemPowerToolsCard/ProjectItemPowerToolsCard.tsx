@@ -99,6 +99,7 @@ export function ProjectItemPowerToolsCard(props: Props) {
             ProjectFiles.NodeModules,
             ProjectFiles.ComposerJson,
             ProjectFiles.Vendor,
+            ProjectFiles.Artisan,
         ];
         projectFilesRef.current = {};
         for (const fileOrDirectory of toCheck) {
@@ -161,8 +162,6 @@ export function ProjectItemPowerToolsCard(props: Props) {
                                                     sessionStorage.removeItem(key);
                                                 });
                                         } else {
-                                            //TODO: move this to another place in the code
-
                                             enqueueSnackbar('Command running! wait until it ends!', {
                                                 variant: 'warning',
                                             });

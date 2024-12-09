@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import { app, ipcMain, net } from 'electron';
 import * as fs from 'fs';
 import path from 'path';
-import { readFromFile, sleep } from '../utils';
+import { readFromFile, sleep, writeToFile } from '../utils';
 
 let marketplaceDownloads: any = {};
 
@@ -46,18 +46,6 @@ async function createFolder(path: string) {
                 resolve(false);
             }
 
-            resolve(true);
-        });
-    });
-}
-
-async function writeToFile(text: string, path: string) {
-    return new Promise<boolean>((resolve, reject) => {
-        fs.writeFile(path, text, 'utf8', (err) => {
-            if (err) {
-                resolve(false);
-                return;
-            }
             resolve(true);
         });
     });

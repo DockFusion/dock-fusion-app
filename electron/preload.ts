@@ -77,13 +77,15 @@ contextBridge.exposeInMainWorld('electron', {
             await ipcRenderer.invoke('self.getEnvironmentByProject', project),
         readProjectFile: async (project: IProject, filePath: string) =>
             await ipcRenderer.invoke('self.readProjectFile', project, filePath),
-        startProject: async (project: IProject) => await ipcRenderer.invoke('self.startProject', project),
+        startProject: async (project: IProject, forceRebuild?: boolean) =>
+            await ipcRenderer.invoke('self.startProject', project, forceRebuild),
         stopProject: async (project: IProject) => await ipcRenderer.invoke('self.stopProject', project),
         doesExist: async (targetPath: string) => await ipcRenderer.invoke('self.doesExist', targetPath),
         doesExistAtProject: async (project: IProject, targetPath: string) =>
             await ipcRenderer.invoke('self.doesExistAtProject', project, targetPath),
         execCommandInProject: async (containerId: string, command: string) =>
             await ipcRenderer.invoke('self.execCommandInProject', containerId, command),
+        updateApp: async (project: IProject) => await ipcRenderer.invoke('self.updateApp', project),
     },
     github: {
         downloadMarketplaceFile: async (downloadUrl: string, github: string, filePath: string) =>

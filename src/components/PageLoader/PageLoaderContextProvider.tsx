@@ -21,7 +21,7 @@ export const PageLoaderContextProvider = (props: any) => {
                 setLoaderVisible,
             }}
         >
-            <SnackbarProvider autoHideDuration={3000} maxSnack={3}>
+            <SnackbarProvider autoHideDuration={5000} maxSnack={3}>
                 <Backdrop open={loaderVisible} mountOnEnter unmountOnExit>
                     <Box sx={{ display: 'flex' }}>
                         <CircularProgress sx={{ color: 'white' }} />

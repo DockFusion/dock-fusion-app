@@ -47,8 +47,8 @@ export const Self = {
     readProjectFile: async (project: IProject, filePath: string) => {
         return await window.electron.self.readProjectFile(project, filePath);
     },
-    startProject: async (project: IProject) => {
-        return await window.electron.self.startProject(project);
+    startProject: async (project: IProject, forceRebuild?: boolean) => {
+        return await window.electron.self.startProject(project, forceRebuild);
     },
     stopProject: async (project: IProject) => {
         return await window.electron.self.stopProject(project);
@@ -61,5 +61,8 @@ export const Self = {
     },
     execCommandInProject: async (containerId: string, command: string) => {
         return await window.electron.self.execCommandInProject(containerId, command);
+    },
+    updateApp: async (project: IProject) => {
+        return await window.electron.self.updateApp(project);
     },
 };
