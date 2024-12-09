@@ -6,6 +6,7 @@ import {
     PlayArrow,
     RestartAlt,
     Stop,
+    Terminal,
     Update,
     Warning,
 } from '@mui/icons-material';
@@ -14,6 +15,7 @@ import {
     Box,
     CircularProgress,
     Container,
+    Divider,
     Drawer,
     IconButton,
     ImageList,
@@ -253,114 +255,142 @@ export function ProjectItem(props: Props) {
                             <Box sx={{ width: '100%', overflowY: 'auto', flex: 1 }}>
                                 <List>
                                     {versionsMismatch && (
-                                        <ListItem disablePadding>
-                                            <ListItemButton
-                                                onClick={() => {
-                                                    alertDialogFire({
-                                                        title: `Update ${project.name}`,
-                                                        text: `Do you wish to update app version from ${version} to ${lastVersion} ? The app will be stopped during the update!`,
-                                                        icon: 'question',
-                                                        confirmButtonCb: () => {
-                                                            const key = `${project.domain}|update app version`;
-                                                            if (!sessionStorage.getItem(key)) {
-                                                                sessionStorage.setItem(key, 'true');
+                                        <>
+                                            <ListItem disablePadding>
+                                                <ListItemButton
+                                                    onClick={() => {
+                                                        alertDialogFire({
+                                                            title: `Update ${project.name}`,
+                                                            text: `Do you wish to update app version from ${version} to ${lastVersion} ? The app will be stopped during the update!`,
+                                                            icon: 'question',
+                                                            confirmButtonCb: () => {
+                                                                const key = `${project.domain}|update app version`;
+                                                                if (!sessionStorage.getItem(key)) {
+                                                                    sessionStorage.setItem(key, 'true');
 
-                                                                downloadSourceFileFromGithubByImage(
-                                                                    project.marketplaceItem,
-                                                                )
-                                                                    .then(async (file) => {
-                                                                        enqueueSnackbar(
-                                                                            `[${project.name}] updating...`,
-                                                                            {
-                                                                                variant: 'info',
-                                                                            },
-                                                                        );
-                                                                        try {
-                                                                            if (
-                                                                                containerStatusRef.current !==
-                                                                                ProjectStatus.unknown
-                                                                            ) {
-                                                                                setContainerStatusByProject(
-                                                                                    project.domain,
-                                                                                    ProjectStatus.stopping,
-                                                                                );
-                                                                                await Self.stopProject(project);
-                                                                                while (
+                                                                    downloadSourceFileFromGithubByImage(
+                                                                        project.marketplaceItem,
+                                                                    )
+                                                                        .then(async (file) => {
+                                                                            enqueueSnackbar(
+                                                                                `[${project.name}] updating...`,
+                                                                                {
+                                                                                    variant: 'info',
+                                                                                },
+                                                                            );
+                                                                            try {
+                                                                                if (
                                                                                     containerStatusRef.current !==
                                                                                     ProjectStatus.unknown
                                                                                 ) {
-                                                                                    await sleep(500);
+                                                                                    setContainerStatusByProject(
+                                                                                        project.domain,
+                                                                                        ProjectStatus.stopping,
+                                                                                    );
+                                                                                    await Self.stopProject(project);
+                                                                                    while (
+                                                                                        containerStatusRef.current !==
+                                                                                        ProjectStatus.unknown
+                                                                                    ) {
+                                                                                        await sleep(500);
+                                                                                    }
                                                                                 }
-                                                                            }
 
-                                                                            Self.updateApp(project)
-                                                                                .then(() => {
-                                                                                    enqueueSnackbar(
-                                                                                        `The update for app [${project.name}] completed with success. Enjoy our lastest changes!`,
-                                                                                        {
-                                                                                            variant: 'success',
-                                                                                        },
-                                                                                    );
-                                                                                })
-                                                                                .catch(() => {
-                                                                                    enqueueSnackbar(
-                                                                                        `The update for app [${project.name}] completed with errors! Changes reverted.`,
-                                                                                        {
-                                                                                            variant: 'error',
-                                                                                            autoHideDuration: 8000,
-                                                                                        },
-                                                                                    );
-                                                                                })
-                                                                                .finally(() => {
-                                                                                    setVersionUpdatedCounter(
-                                                                                        versionUpdatedCounter + 1,
-                                                                                    );
-                                                                                    sessionStorage.removeItem(key);
-                                                                                });
-                                                                        } catch (e) {
+                                                                                Self.updateApp(project)
+                                                                                    .then(() => {
+                                                                                        enqueueSnackbar(
+                                                                                            `The update for app [${project.name}] completed with success. Enjoy our lastest changes!`,
+                                                                                            {
+                                                                                                variant: 'success',
+                                                                                            },
+                                                                                        );
+                                                                                    })
+                                                                                    .catch(() => {
+                                                                                        enqueueSnackbar(
+                                                                                            `The update for app [${project.name}] completed with errors! Changes reverted.`,
+                                                                                            {
+                                                                                                variant: 'error',
+                                                                                                autoHideDuration: 8000,
+                                                                                            },
+                                                                                        );
+                                                                                    })
+                                                                                    .finally(() => {
+                                                                                        setVersionUpdatedCounter(
+                                                                                            versionUpdatedCounter + 1,
+                                                                                        );
+                                                                                        sessionStorage.removeItem(key);
+                                                                                    });
+                                                                            } catch (e) {
+                                                                                enqueueSnackbar(
+                                                                                    `Couldn't stop app [${project.name}] Please stop if manually before updating!`,
+                                                                                    {
+                                                                                        variant: 'error',
+                                                                                        autoHideDuration: 8000,
+                                                                                    },
+                                                                                );
+                                                                                sessionStorage.removeItem(key);
+                                                                            }
+                                                                        })
+                                                                        .catch(() => {
                                                                             enqueueSnackbar(
-                                                                                `Couldn't stop app [${project.name}] Please stop if manually before updating!`,
+                                                                                `Couldn't download the update. Please make sure you have proper internet connection before trying again`,
                                                                                 {
                                                                                     variant: 'error',
                                                                                     autoHideDuration: 8000,
                                                                                 },
                                                                             );
                                                                             sessionStorage.removeItem(key);
-                                                                        }
-                                                                    })
-                                                                    .catch(() => {
-                                                                        enqueueSnackbar(
-                                                                            `Couldn't download the update. Please make sure you have proper internet connection before trying again`,
-                                                                            {
-                                                                                variant: 'error',
-                                                                                autoHideDuration: 8000,
-                                                                            },
-                                                                        );
-                                                                        sessionStorage.removeItem(key);
-                                                                    });
-                                                            } else {
-                                                                enqueueSnackbar(
-                                                                    `The app [${project.name}] is already being updated. please wait!`,
-                                                                    {
-                                                                        variant: 'warning',
-                                                                    },
-                                                                );
-                                                            }
-                                                        },
-                                                        showCancelButton: true,
-                                                        confirmButtonText: 'Yes',
-                                                        cancelButtonText: 'No',
-                                                        cancelButtonColor: 'error',
-                                                    });
-                                                }}
-                                            >
-                                                <ListItemIcon>
-                                                    <Update />
-                                                </ListItemIcon>
-                                                <ListItemText primary={'Update app'} />
-                                            </ListItemButton>
-                                        </ListItem>
+                                                                        });
+                                                                } else {
+                                                                    enqueueSnackbar(
+                                                                        `The app [${project.name}] is already being updated. please wait!`,
+                                                                        {
+                                                                            variant: 'warning',
+                                                                        },
+                                                                    );
+                                                                }
+                                                            },
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Yes',
+                                                            cancelButtonText: 'No',
+                                                            cancelButtonColor: 'error',
+                                                        });
+                                                    }}
+                                                >
+                                                    <ListItemIcon>
+                                                        <Update />
+                                                    </ListItemIcon>
+                                                    <ListItemText primary={'Update app'} />
+                                                </ListItemButton>
+                                            </ListItem>
+                                            <Divider sx={{ my: 1 }} />
+                                        </>
                                     )}
+                                    <ListItem disablePadding>
+                                        <ListItemButton
+                                            onClick={() => {
+                                                Self.spawnTerminalAtProject(project, 'bash');
+                                            }}
+                                        >
+                                            <ListItemIcon style={{ width: '1em', height: '1em', fontSize: '1.5rem' }}>
+                                                <Terminal />
+                                            </ListItemIcon>
+                                            <ListItemText primary={'Open shell'} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                    <ListItem disablePadding>
+                                        <ListItemButton
+                                            onClick={() => {
+                                                Self.spawnLogsAtProject(project);
+                                            }}
+                                        >
+                                            <ListItemIcon style={{ width: '1em', height: '1em', fontSize: '1.5rem' }}>
+                                                <Terminal />
+                                            </ListItemIcon>
+                                            <ListItemText primary={'Open logs'} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                    <Divider sx={{ my: 1 }} />
                                     {[
                                         ProjectStatus.stopped,
                                         ProjectStatus.unknown,
@@ -456,6 +486,7 @@ export function ProjectItem(props: Props) {
                                             <ListItemText primary={'Rebuild app'} />
                                         </ListItemButton>
                                     </ListItem>
+                                    <Divider sx={{ my: 1 }} />
                                     <ListItem disablePadding>
                                         <ListItemButton
                                             sx={{ backgroundColor: muiTheme.palette.error.main }}

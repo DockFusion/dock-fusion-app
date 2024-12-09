@@ -113,6 +113,9 @@ declare global {
                 execCommandInProject: (containerId: string, command: string) => Promise<void>;
                 updateApp: (project: IProject) => Promise<void>;
                 removeApp: (project: IProject) => Promise<void>;
+                spawnTerminal: (command: string) => Promise<void>;
+                spawnTerminalAtProject: (project: IProject, command: string) => Promise<void>;
+                spawnLogsAtProject: (project: IProject) => Promise<void>;
             };
             github: {
                 downloadMarketplaceFile: (downloadUrl: string, github: string, filePath: string) => Promise<string>;

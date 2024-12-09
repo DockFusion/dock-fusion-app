@@ -1,4 +1,5 @@
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
+import Dockerode from 'dockerode';
 import { app, dialog, ipcMain, OpenDialogOptions, OpenDialogReturnValue } from 'electron';
 import fs from 'fs';
 import path from 'path';
@@ -23,6 +24,8 @@ import {
     writeToFile,
 } from '../utils';
 const getPort = require('get-ports');
+
+const docker = new Dockerode({});
 
 ipcMain.handle('self.restart', async function () {
     app.relaunch();
@@ -611,3 +614,42 @@ ipcMain.handle(
 ipcMain.handle('self.doesExist', async function (_: any, targetPath: string): Promise<boolean> {
     return doesExist(targetPath);
 });
+
+ipcMain.handle('self.spawnLogsAtProject', async (_: any, project: IProject) => {
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+
+    await runCommandInTerminal(`docker compose -p ${dockerGroupName}-${project.domain} logs -f -n 20`, appDataPath);
+});
+
+ipcMain.handle('self.spawnTerminalAtProject', async (_: any, project: IProject, command: string) => {
+    const projectKey = 'com.docker.compose.project';
+    const projectName = `${dockerGroupName}-${project.domain}`;
+    const containers = (await docker.listContainers()).filter((el) => el.Labels[projectKey] === projectName);
+
+    if (!containers.length) {
+        throw new Error('No container available');
+    }
+
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+    const containerId = containers[0].Id;
+
+    await runCommandInTerminal(`docker exec -it ${containerId} ${command}`, appDataPath);
+});
+
+ipcMain.handle('self.spawnTerminal', async (_: any, command: string) => {
+    await runCommandInTerminal(command);
+});
+
+function runCommandInTerminal(command: string, folderPath?: string) {
+    // Spawn a terminal with the given command
+    spawn(command, {
+        shell: true,
+        detached: true,
+        cwd: folderPath,
+        stdio: 'ignore',
+    }).unref();
+}

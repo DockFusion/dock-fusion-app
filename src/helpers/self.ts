@@ -68,4 +68,13 @@ export const Self = {
     removeApp: async (project: IProject) => {
         return await window.electron.self.removeApp(project);
     },
+    spawnTerminal: async (command: string) => {
+        return await window.electron.self.spawnTerminal(command);
+    },
+    spawnTerminalAtProject: async (project: IProject, command: string) => {
+        return await window.electron.self.spawnTerminalAtProject(project, command);
+    },
+    spawnLogsAtProject: async (project: IProject) => {
+        return await window.electron.self.spawnLogsAtProject(project);
+    },
 };
