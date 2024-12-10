@@ -132,9 +132,9 @@ ipcMain.handle('windows.delete', async function (_: any, deletePath: string) {
 });
 
 ipcMain.handle('windows.installDependencies', async function (_: any): Promise<void> {
-    installChocolatey();
-    installMkcert();
-    setupMkcert();
+    await installChocolatey();
+    await installMkcert();
+    await setupMkcert();
 });
 
 ipcMain.handle('windows.checkDependencies', async function (_: any): Promise<boolean> {

@@ -1,4 +1,4 @@
-.PHONY: up react electron build
+.PHONY: up react electron package
 .ONESHELL:
 
 ifeq ($(OS),Windows_NT)
@@ -38,5 +38,5 @@ react:
 electron:
 	@npm run electron:start
 
-build:
+package:
 	@npm run package

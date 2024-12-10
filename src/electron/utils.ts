@@ -311,7 +311,7 @@ export const runCommand = (command: string) => {
 };
 
 // Step 1: Install Chocolatey
-export const installChocolatey = () => {
+export const installChocolatey = async () => {
     const isChocoInstalled = isCommandAvailable('choco');
     if (isChocoInstalled) {
         return;
@@ -319,23 +319,23 @@ export const installChocolatey = () => {
     const chocoInstallScript = `
       @powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy Bypass -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
     `;
-    runAsAdmin(chocoInstallScript);
+    await runAsAdmin(chocoInstallScript);
 };
 
 // Step 2: Install mkcert using Chocolatey
-export const installMkcert = () => {
+export const installMkcert = async () => {
     const isMkcertInstalled = isCommandAvailable('mkcert');
     if (isMkcertInstalled) {
         return;
     }
-    runAsAdmin('choco install mkcert -y');
+    await runAsAdmin('choco install mkcert -y');
 };
 
 // Step 3: Run mkcert -install
-export const setupMkcert = () => {
+export const setupMkcert = async () => {
     const isMkcertInstalled = isCommandAvailable('mkcert');
     if (!isMkcertInstalled) {
-        installMkcert();
+        await installMkcert();
     }
     const isMkcertReady = isMkcertConfigured();
     if (isMkcertReady) {
