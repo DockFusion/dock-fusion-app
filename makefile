@@ -1,3 +1,4 @@
+.PHONY: up react electron build
 .ONESHELL:
 
 ifeq ($(OS),Windows_NT)
@@ -29,10 +30,13 @@ GOALS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 ARGUMENTS := $(if $(args),$(args)$(if $(GOALS), ,),)$(GOALS)
 
 up:
-	@npm run up
+	@npm run up:dev
 
 react:
-	@npm run start
+	@npm run react:start
 
 electron:
-	@npm run electron
+	@npm run electron:start
+
+build:
+	@npm run package

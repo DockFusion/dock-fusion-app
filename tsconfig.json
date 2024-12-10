@@ -14,7 +14,7 @@
         "allowSyntheticDefaultImports": true,
         "target": "ES2022",
         "sourceMap": true,
-        "outDir": "dist/app",
+        "outDir": "./build",
         "lib": [
             "es6",
             "dom",
@@ -37,14 +37,10 @@
         "strict": true,
         "noImplicitThis": true,
         "baseUrl": "./",
-        "rootDir": "./",
         "paths": {
             "src/*": [
-                "src/*"
+                "./src/*"
             ],
-            "shared/*": [
-                "src/shared/*"
-            ]
         },
         "types": [
             "node",
@@ -52,9 +48,14 @@
         ]
     },
     "include": [
-        "src/**/*"
+        "src/renderer/**/*",
+        "src/shared/**/*",
+        "src/lib/**/*",
+        "src/index.tsx",
+        "public",
     ],
     "exclude": [
+        "build",
         "dist",
         "node_modules",
         "coverage",

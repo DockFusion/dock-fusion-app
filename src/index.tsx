@@ -1,18 +1,18 @@
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './i18n';
+import { HashRouter, Route, Routes } from 'react-router-dom';
+import './renderer/i18n';
 
 //master base
-import { SubRoutes } from './routes/SubRoutes';
+import { SubRoutes } from './renderer/routes/SubRoutes';
 
 import { StyledEngineProvider } from '@mui/material';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
-import { muiDarkTheme } from './assets/muiTheme';
-import { DockerStatusTrackerContextProvider } from './components/DockerStatusTracker/DockerStatusTrackerContextProvider';
-import { DynamicStrictMode } from './components/DynamicStrictMode/DynamicStrictMode';
-import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
-import { PageLoaderContextProvider } from './components/PageLoader/PageLoaderContextProvider';
-import { ProjectsContextProvider } from './components/ProjectsProvider/ProjectsContextProvider';
+import { muiDarkTheme } from './renderer/assets/muiTheme';
+import { DockerStatusTrackerContextProvider } from './renderer/components/DockerStatusTracker/DockerStatusTrackerContextProvider';
+import { DynamicStrictMode } from './renderer/components/DynamicStrictMode/DynamicStrictMode';
+import { ErrorBoundary } from './renderer/components/ErrorBoundary/ErrorBoundary';
+import { PageLoaderContextProvider } from './renderer/components/PageLoader/PageLoaderContextProvider';
+import { ProjectsContextProvider } from './renderer/components/ProjectsProvider/ProjectsContextProvider';
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
@@ -23,13 +23,13 @@ root.render(
                 <ErrorBoundary>
                     <DockerStatusTrackerContextProvider>
                         <ProjectsContextProvider>
-                            <BrowserRouter>
+                            <HashRouter>
                                 <PageLoaderContextProvider>
                                     <Routes>
                                         <Route path='/*' element={<SubRoutes />} />
                                     </Routes>
                                 </PageLoaderContextProvider>
-                            </BrowserRouter>
+                            </HashRouter>
                         </ProjectsContextProvider>
                     </DockerStatusTrackerContextProvider>
                 </ErrorBoundary>
