@@ -29,20 +29,21 @@ function isDev() {
     return !app.isPackaged;
 }
 
-const singleInstanceLock = app.requestSingleInstanceLock();
-if (!singleInstanceLock) {
-    app.quit();
-} else {
-    app.on('second-instance', (_event: Electron.Event, argv: string[]) => {
-        app.focus();
-    });
-}
-
 const productName = `DockFusion${isDev() ? '-dev' : ''}`;
 app.setName(productName);
 app.setPath('userData', path.join(app.getPath('appData'), productName));
 let mainWindow: BrowserWindow;
 (app as any).isQuitting = false;
+
+const singleInstanceLock = app.requestSingleInstanceLock();
+if (!singleInstanceLock) {
+    app.quit();
+} else {
+    app.on('second-instance', (_event: Electron.Event, argv: string[]) => {
+        mainWindow?.show();
+        app.focus();
+    });
+}
 
 async function createWindow() {
     // Create the browser window.
