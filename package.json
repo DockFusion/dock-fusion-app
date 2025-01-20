@@ -1,6 +1,6 @@
 {
     "name": "dock-fusion",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "type": "commonjs",
     "description": "DockFusion",
     "scripts": {
@@ -66,6 +66,7 @@
         "child_process": "^1.0.2",
         "classnames": "^2.5.1",
         "dockerode": "^4.0.2",
+        "electron-updater": "^6.3.9",
         "envfile": "^7.1.0",
         "esm": "^3.2.25",
         "get-ports": "^1.0.3",
@@ -87,15 +88,26 @@
     "main": "build/main.js",
     "homepage": "./",
     "build": {
-        "appId": "com.docker-fusion",
+        "productName": "DockFusion",
+        "executableName": "DockFusion",
+        "appId": "com.dock-fusion",
         "files": [
+            "assets/**/*",
             "build/**/*",
             "dist/electron/electron/**/*",
             "package.json"
         ],
         "win": {
             "target": "nsis",
-            "icon": "assets/app-logo.ico"
-        }
+            "icon": "assets/app-logo.ico",
+            "artifactName": "${productName}-${version}-setup.${ext}"
+        },
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "DockFusion",
+                "repo": "dock-fusion-app"
+            }
+        ]
     }
 }

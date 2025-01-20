@@ -11,7 +11,7 @@ register({
 });
 
 // Modules to control application life and create native browser window
-import { app, BrowserWindow, net, protocol, shell } from 'electron';
+import { app, autoUpdater, BrowserWindow, Menu, nativeImage, net, protocol, shell, Tray } from 'electron';
 import { appName, homeAppDataFolderName } from 'src/shared/constants';
 import './electron/ipcMain/child_process';
 import './electron/ipcMain/detectEditors';
@@ -40,10 +40,12 @@ if (!singleInstanceLock) {
 const productName = `DockFusion${isDev() ? '-dev' : ''}`;
 app.setName(productName);
 app.setPath('userData', path.join(app.getPath('appData'), productName));
+let mainWindow: BrowserWindow;
+(app as any).isQuitting = false;
 
 async function createWindow() {
     // Create the browser window.
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         title: appName,
         skipTaskbar: false, // can be used to start the app without the window visible
         minWidth: 550,
@@ -95,6 +97,13 @@ async function createWindow() {
 
     mainWindow.once('focus', () => mainWindow.flashFrame(false));
     mainWindow.flashFrame(true);
+
+    mainWindow.on('close', (event) => {
+        if (!(app as any).isQuitting) {
+            event.preventDefault();
+            mainWindow.hide();
+        }
+    });
 }
 
 // This method will be called when Electron has finished
@@ -124,6 +133,45 @@ app.whenReady().then(async () => {
             await createWindow();
         }
     });
+
+    const tray = new Tray(
+        nativeImage.createFromPath(path.join(app.getAppPath(), isDev() ? '..' : '', 'assets/app-logo.png')),
+    );
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Open DockFusion',
+            click: function () {
+                mainWindow.show();
+            },
+        },
+        {
+            label: 'Quit',
+            click: function () {
+                app.quit();
+            },
+        },
+    ]);
+    tray.on('click', () => {
+        mainWindow.show();
+    });
+    tray.setToolTip('Open DockFusion');
+    tray.setContextMenu(contextMenu);
+
+    autoUpdater.checkForUpdates();
+
+    autoUpdater.on('update-available', () => {
+        console.log('Update available!');
+        mainWindow.webContents.send('update-available');
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+        console.log('Update downloaded!');
+        mainWindow.webContents.send('update-downloaded');
+    });
+});
+
+app.on('before-quit', (event) => {
+    (app as any).isQuitting = true;
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
