@@ -1,6 +1,6 @@
 {
     "name": "dock-fusion",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "type": "commonjs",
     "description": "DockFusion",
     "scripts": {
@@ -106,7 +106,8 @@
             {
                 "provider": "github",
                 "owner": "DockFusion",
-                "repo": "dock-fusion-app"
+                "repo": "dock-fusion-app",
+                "releaseType": "draft"
             }
         ]
     }

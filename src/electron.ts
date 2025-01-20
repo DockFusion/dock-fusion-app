@@ -157,17 +157,36 @@ app.whenReady().then(async () => {
     tray.setToolTip('Open DockFusion');
     tray.setContextMenu(contextMenu);
 
-    autoUpdater.checkForUpdates();
-
     autoUpdater.on('update-available', () => {
         console.log('Update available!');
         mainWindow.webContents.send('update-available');
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        console.log('No update available.');
+        mainWindow.webContents.send('update-not-available');
+    });
+
+    autoUpdater.on('error', (error) => {
+        console.error('Error during update:', error);
+        mainWindow.webContents.send('update-error', error.message);
     });
 
     autoUpdater.on('update-downloaded', () => {
         console.log('Update downloaded!');
         mainWindow.webContents.send('update-downloaded');
     });
+
+    // if (isDev()) {
+    //     // const version = require('@/package.json').version
+    //     const version = '1.0.2';
+    //     console.log(version);
+    //     const feedURL = `https://github.com/DockFusion/dock-fusion-app/releases/download/v${version}/`;
+    //     autoUpdater.setFeedURL({
+    //         url: feedURL,
+    //     });
+    // }
+    // autoUpdater.checkForUpdates();
 });
 
 app.on('before-quit', (event) => {
