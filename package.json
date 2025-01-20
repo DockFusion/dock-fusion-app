@@ -107,7 +107,7 @@
                 "provider": "github",
                 "owner": "DockFusion",
                 "repo": "dock-fusion-app",
-                "releaseType": "draft"
+                "releaseType": "release"
             }
         ]
     }
