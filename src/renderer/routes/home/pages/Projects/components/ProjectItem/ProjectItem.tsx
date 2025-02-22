@@ -1,6 +1,7 @@
 import {
     Circle,
     Delete,
+    FolderOpen,
     KeyboardDoubleArrowLeft,
     KeyboardDoubleArrowRight,
     PlayArrow,
@@ -242,6 +243,16 @@ export function ProjectItem(props: Props) {
                         >
                             <Box sx={{ width: '100%' }}>
                                 <Stack direction={'row'} justifyContent={'flex-end'} sx={{ my: '5px' }}>
+                                    <Tooltip title='Open configuration folder'>
+                                        <IconButton
+                                            onClick={() => {
+                                                Self.openProjectAppDataFolder(project);
+                                            }}
+                                            sx={{ width: 'fit-content' }}
+                                        >
+                                            <FolderOpen />
+                                        </IconButton>
+                                    </Tooltip>
                                     <IconButton
                                         onClick={() => {
                                             setSidebarMenuOpen(false);

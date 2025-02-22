@@ -116,6 +116,8 @@ declare global {
                 spawnTerminal: (command: string) => Promise<void>;
                 spawnTerminalAtProject: (project: IProject, command: string) => Promise<void>;
                 spawnLogsAtProject: (project: IProject) => Promise<void>;
+                openFolder: (targetPath: string) => Promise<void>;
+                openProjectAppDataFolder: (project: IProject) => Promise<void>;
             };
             github: {
                 downloadMarketplaceFile: (downloadUrl: string, github: string, filePath: string) => Promise<string>;

@@ -23,7 +23,14 @@ export function ProjectItemMainInfoCard(props: Props) {
     useEffect(() => {
         Self.getEnvironmentByProject(props.project).then((envVars) => {
             setAppPath(envVars.APP_CODE_PATH_HOST ?? '');
-            setAppDataPath(envVars.DATA_PATH_HOST ?? '');
+            setAppDataPath('');
+
+            const newAppDataPath = envVars.DATA_PATH_HOST ?? '';
+            Self.doesExist(newAppDataPath).then((exists) => {
+                if (exists) {
+                    setAppDataPath(newAppDataPath);
+                }
+            });
         });
     }, [props.project]);
 
@@ -51,7 +58,16 @@ export function ProjectItemMainInfoCard(props: Props) {
                 </CardInfo>
                 {appPath && (
                     <CardInfo title={'Project location'}>
-                        <Tooltip placement='bottom' title={appPath}>
+                        <Tooltip
+                            placement='bottom'
+                            title={appPath}
+                            onClick={() => {
+                                Self.openFolder(appPath);
+                            }}
+                            style={{
+                                cursor: 'pointer',
+                            }}
+                        >
                             <Typography noWrap height='fit-content'>
                                 {appPath}
                             </Typography>
@@ -60,7 +76,17 @@ export function ProjectItemMainInfoCard(props: Props) {
                 )}
                 {appDataPath && (
                     <CardInfo title={'Data location'}>
-                        <Tooltip placement='bottom' title={appDataPath}>
+                        <Tooltip
+                            placement='bottom'
+                            title={appDataPath}
+                            onClick={() => {
+                                console.log(appDataPath);
+                                Self.openFolder(appDataPath);
+                            }}
+                            style={{
+                                cursor: 'pointer',
+                            }}
+                        >
                             <Typography noWrap height='fit-content'>
                                 {appDataPath}
                             </Typography>

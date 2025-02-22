@@ -77,4 +77,10 @@ export const Self = {
     spawnLogsAtProject: async (project: IProject) => {
         return await window.electron.self.spawnLogsAtProject(project);
     },
+    openFolder: async (targetPath: string) => {
+        return await window.electron.self.openFolder(targetPath);
+    },
+    openProjectAppDataFolder: async (project: IProject) => {
+        return await window.electron.self.openProjectAppDataFolder(project);
+    },
 };

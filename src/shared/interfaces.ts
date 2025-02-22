@@ -21,6 +21,7 @@ export interface IInstallAppSettings {
 }
 
 export interface IProject {
+    label?: string;
     domain: string;
     appId: string;
     github: string;

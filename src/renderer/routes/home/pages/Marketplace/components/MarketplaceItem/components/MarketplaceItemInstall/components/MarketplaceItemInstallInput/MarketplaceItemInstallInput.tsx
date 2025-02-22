@@ -3,6 +3,7 @@ import { MarketplaceItemInstallDbCredentials } from '../MarketplaceItemInstallDb
 import { MarketplaceItemInstallDomain } from '../MarketplaceItemInstallDomain/MarketplaceItemInstallDomain';
 import { MarketplaceItemInstallHorizontalRadio } from '../MarketplaceItemInstallHorizontalRadio/MarketplaceItemInstallHorizontalRadio';
 import { MarketplaceItemInstallPathSelect } from '../MarketplaceItemInstallPathSelect/MarketplaceItemInstallPathSelect';
+import { MarketplaceItemInstallProjectLabel } from '../MarketplaceItemInstallProjectLabel/MarketplaceItemInstallProjectLabel';
 import { MarketplaceItemInstallSwitch } from '../MarketplaceItemInstallSwitch/MarketplaceItemInstallSwitch';
 
 interface Props {
@@ -15,6 +16,11 @@ interface Props {
 
 export function MarketplaceItemInstallInput(props: Props) {
     switch (props.type) {
+        case 'project-label':
+            return (
+                <MarketplaceItemInstallProjectLabel value={props.value} error={props.error} onChange={props.onChange} />
+            );
+
         case 'domain':
             return <MarketplaceItemInstallDomain value={props.value} error={props.error} onChange={props.onChange} />;
 

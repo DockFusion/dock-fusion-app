@@ -26,7 +26,7 @@ export function Sidebar() {
     return (
         <Stack direction={'column'} gap='6px' sx={{ height: '100%' }}>
             <div style={{ padding: 0, paddingLeft: '5px', paddingRight: '5px', width: '100%' }}>
-                <img src={logo} style={{ width: '100%' }} />
+                <img src={logo} style={{ width: '100%', filter: 'brightness(0) invert(1)' }} />
             </div>
             <Stack direction={'column'} gap='6px' sx={{ px: '5px', overflowY: 'auto' }}>
                 <Tooltip title='Projects'>

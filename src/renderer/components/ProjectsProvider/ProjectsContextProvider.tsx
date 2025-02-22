@@ -50,7 +50,7 @@ export const ProjectsContextProvider = (props: any) => {
                     const cleanName = project.domain.replaceAll('-', ' ');
                     return {
                         ...project,
-                        name: `${cleanName.charAt(0).toUpperCase()}${cleanName.slice(1)}`,
+                        name: project.label ?? `${cleanName.charAt(0).toUpperCase()}${cleanName.slice(1)}`,
                         marketplaceItem: mappedMarketplaceItems[project.appId],
                     };
                 }),

@@ -91,6 +91,9 @@ contextBridge.exposeInMainWorld('electron', {
         spawnTerminalAtProject: async (project: IProject, command: string) =>
             await ipcRenderer.invoke('self.spawnTerminalAtProject', project, command),
         spawnLogsAtProject: async (project: IProject) => await ipcRenderer.invoke('self.spawnLogsAtProject', project),
+        openFolder: async (targetPath: string) => await ipcRenderer.invoke('self.openFolder', targetPath),
+        openProjectAppDataFolder: async (project: IProject) =>
+            await ipcRenderer.invoke('self.openProjectAppDataFolder', project),
     },
     github: {
         downloadMarketplaceFile: async (downloadUrl: string, github: string, filePath: string) =>

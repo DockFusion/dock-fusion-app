@@ -94,12 +94,17 @@ ipcMain.handle(
         let env: any = {};
         let systemEnv: any = {};
         let domain = '';
+        let projectLabel = null;
 
         for (const option of options) {
             if (option.type === 'domain') {
                 appDataPath = path.join(appDataPath, option.value);
                 dataPath = path.join(dataPath, option.value);
                 domain = option.value;
+            } else if (option.type === 'project-label') {
+                projectLabel = option.value;
+            }
+            if (domain !== '' && projectLabel !== null) {
                 break;
             }
         }
@@ -116,6 +121,7 @@ ipcMain.handle(
         }
 
         projects.push({
+            label: projectLabel,
             domain: domain,
             appId: marketplaceItem.id,
             github: marketplaceItem.github,
@@ -667,3 +673,15 @@ function runCommandInTerminal(command: string, folderPath?: string) {
         stdio: 'ignore',
     }).unref();
 }
+
+ipcMain.handle('self.openFolder', async function (_: any, targetPath: string): Promise<void> {
+    exec(`explorer.exe "${targetPath}"`);
+});
+
+ipcMain.handle('self.openProjectAppDataFolder', async function (_: any, project: IProject): Promise<void> {
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+
+    exec(`explorer.exe "${appDataPath}"`);
+});

@@ -23,6 +23,7 @@ function getDefaultValue(type: string) {
             return false;
 
         case 'path-select':
+        case 'project-label':
         case 'domain':
             return '';
 
@@ -52,9 +53,16 @@ export function MarketplaceItemInstall(props: Props) {
         // user settings first
         if (props.settings) {
             formStructure.push({
+                title: 'Your stack Name',
+                description: 'Enter a name for this stack! This is just a display value.',
+                type: 'project-label',
+                value: getDefaultValue('project-label'),
+            });
+
+            formStructure.push({
                 title: 'Your stack URL',
                 description:
-                    "Enter a name for this stack, lowercase with dashes prefered. Make sure it's unique to your stacks!",
+                    "Enter a domain for this stack, lowercase with dashes prefered. Make sure it's unique to your stacks!",
                 type: 'domain',
                 value: getDefaultValue('domain'),
             });
@@ -121,13 +129,26 @@ export function MarketplaceItemInstall(props: Props) {
         let newformStructure = [...formStructure];
 
         let containsErrors = false;
+        let projectLabel = null;
         let domain = null;
         for (let i = 0; i < newformStructure.length; ++i) {
             const structure = newformStructure[i];
 
             switch (structure.type) {
+                case 'project-label':
+                    projectLabel = structure.value;
+                    if (!structure.value) {
+                        newformStructure[i].error = 'This field can not be empty!';
+                        containsErrors = true;
+                    }
+                    break;
+
                 case 'domain':
                     domain = structure.value;
+                    if (!structure.value) {
+                        newformStructure[i].error = 'This field can not be empty!';
+                        containsErrors = true;
+                    }
                     break;
 
                 case 'checkbox':

@@ -34,7 +34,7 @@ export function Marketplace() {
 
     return (
         <Stack direction={'row'} sx={{ height: '100%', width: '100%', maxWidth: 'calc(100vw - min(8vw, 70px))' }}>
-            <Container sx={{ width: '22vw', maxWidth: '200px', height: '100%' }} style={{ padding: 0 }}>
+            <Container sx={{ width: '22vw', maxWidth: '200px', height: '100%' }} style={{ padding: 0, margin: 0 }}>
                 <Stack gap='6px' sx={{ px: '10px', height: '100%' }}>
                     <TextField
                         placeholder='Search'
