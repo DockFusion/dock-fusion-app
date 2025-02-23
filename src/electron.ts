@@ -61,7 +61,7 @@ if (!singleInstanceLock) {
                 nodeIntegration: true,
                 nodeIntegrationInSubFrames: true,
                 preload: path.join(__dirname, './electron/preload.js'),
-                // devTools: isDev(),
+                devTools: isDev(),
                 contextIsolation: true,
             },
         });

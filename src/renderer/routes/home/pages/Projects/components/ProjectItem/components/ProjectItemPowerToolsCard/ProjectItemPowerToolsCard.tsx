@@ -103,7 +103,7 @@ export function ProjectItemPowerToolsCard(props: Props) {
         ];
         projectFilesRef.current = {};
         for (const fileOrDirectory of toCheck) {
-            Self.doesExistAtProject(props.project, fileOrDirectory).then((res) => {
+            Self.doesExistAtProjectCodePath(props.project, fileOrDirectory).then((res) => {
                 if (signal.aborted) {
                     return;
                 }

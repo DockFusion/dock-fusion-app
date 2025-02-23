@@ -12,9 +12,7 @@ import { Self } from 'src/renderer/helpers/self';
 import { getDefaultValue } from '../../../Marketplace/components/MarketplaceItem/components/MarketplaceItemInstall/MarketplaceItemInstall';
 import { MarketplaceItemInstallSection } from '../../../Marketplace/components/MarketplaceItem/components/MarketplaceItemInstall/components/MarketplaceItemInstallSection/MarketplaceItemInstallSection';
 
-interface Props {
-    projects: IProjectWithMarketPlace[];
-}
+interface Props {}
 
 export function ProjectItemEditForm(props: Props) {
     const [logoUrl, setLogoUrl] = useState('');
@@ -25,9 +23,10 @@ export function ProjectItemEditForm(props: Props) {
     const [settingsLoading, setSettingsLoading] = useState(false);
     const { setLoaderVisible } = usePageLoaderContext();
     const { projectDomain } = useParams();
+    const { refreshProjects, projects } = useProjectsContext();
     const project = useMemo(() => {
-        return props.projects.find((el) => el.domain == projectDomain);
-    }, [projectDomain]);
+        return projects.find((el) => el.domain == projectDomain);
+    }, [projectDomain, projects]);
     const { containerStatus, containerStatusColor } = useDockerStatusTrackerContext({
         project: project,
     });
@@ -36,7 +35,6 @@ export function ProjectItemEditForm(props: Props) {
     const [formStructure, setFormStructure] = useState([]);
     const formStructureRef = useRef(formStructure);
     formStructureRef.current = formStructure;
-    const { refreshProjects } = useProjectsContext();
 
     useEffect(() => {
         if (settingsLoading) {
@@ -44,6 +42,22 @@ export function ProjectItemEditForm(props: Props) {
             return;
         }
         let formStructure = [];
+
+        function getCurrentValue(target: string, type: string) {
+            switch (type) {
+                case 'checkbox':
+                case 'switch':
+                    if (envVars[target]) {
+                        return Boolean(
+                            typeof envVars[target] === 'string' ? JSON.parse(envVars[target]) : envVars[target],
+                        );
+                    }
+                    return getDefaultValue(type);
+
+                default:
+                    return envVars[target] ?? getDefaultValue(type);
+            }
+        }
 
         // user settings first
         if (settings && envVars) {
@@ -57,7 +71,7 @@ export function ProjectItemEditForm(props: Props) {
                                 type: userSetting.type,
                                 target: userSetting.target,
                                 values: userSetting.values ?? [],
-                                value: envVars[userSetting.target] ?? getDefaultValue(userSetting.type),
+                                value: getCurrentValue(userSetting.target, userSetting.type),
                             });
                         } else {
                             formStructure.push(
@@ -141,28 +155,10 @@ export function ProjectItemEditForm(props: Props) {
         let newformStructure = [...formStructure];
 
         let containsErrors = false;
-        let projectLabel = null;
-        let domain = null;
         for (let i = 0; i < newformStructure.length; ++i) {
             const structure = newformStructure[i];
 
             switch (structure.type) {
-                case 'project-label':
-                    projectLabel = structure.value;
-                    if (!structure.value) {
-                        newformStructure[i].error = 'This field can not be empty!';
-                        containsErrors = true;
-                    }
-                    break;
-
-                case 'domain':
-                    domain = structure.value;
-                    if (!structure.value) {
-                        newformStructure[i].error = 'This field can not be empty!';
-                        containsErrors = true;
-                    }
-                    break;
-
                 case 'checkbox':
                 case 'switch':
                     break;
@@ -207,17 +203,18 @@ export function ProjectItemEditForm(props: Props) {
             return;
         }
 
-        Self.installApp(newformStructure, project.marketplaceItem)
+        Self.editApp(newformStructure, project)
             .then(() => {
-                enqueueSnackbar(`New ${project.marketplaceItem.name} app installed with success.`, {
+                enqueueSnackbar(`${project.name} app edited with success.`, {
                     variant: 'success',
                 });
+                // Self.startProject(project, true);
                 refreshProjects().then(() => {
-                    navigate(`/home/projects/${domain}`);
+                    navigate(`/home/projects/${project.domain}`);
                 });
             })
             .catch(() => {
-                enqueueSnackbar(`Couldn't install the new ${project.marketplaceItem.name} app with success!`, {
+                enqueueSnackbar(`Couldn't edit the ${project.name} app with success!`, {
                     variant: 'error',
                     autoHideDuration: 8000,
                 });

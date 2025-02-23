@@ -2,6 +2,8 @@ import { ipcMain } from 'electron';
 import {
     doesExist,
     doesExistAtProject,
+    doesExistAtProjectCodePath,
+    editApp,
     execCommandInProject,
     getEnvironmentByProject,
     getPath,
@@ -13,6 +15,7 @@ import {
     openProjectAppDataFolder,
     readProjectFile,
     removeApp,
+    renameApp,
     restart,
     showOpenDialog,
     spawnLogsAtProject,
@@ -33,6 +36,10 @@ ipcMain.handle('self.showOpenDialog', showOpenDialog);
 
 ipcMain.handle('self.installApp', installApp);
 
+ipcMain.handle('self.editApp', editApp);
+
+ipcMain.handle('self.renameApp', renameApp);
+
 ipcMain.handle('self.updateApp', updateApp);
 
 ipcMain.handle('self.removeApp', removeApp);
@@ -50,6 +57,8 @@ ipcMain.handle('self.startProject', startProject);
 ipcMain.handle('self.stopProject', stopProject);
 
 ipcMain.handle('self.execCommandInProject', execCommandInProject);
+
+ipcMain.handle('self.doesExistAtProjectCodePath', doesExistAtProjectCodePath);
 
 ipcMain.handle('self.doesExistAtProject', doesExistAtProject);
 

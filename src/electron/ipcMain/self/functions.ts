@@ -111,7 +111,7 @@ export async function installApp(
     if (projects.find((el) => el.domain == domain)) {
         const error = `There is already a project named: ${domain}`;
         console.error(error);
-        return error;
+        throw Error(error);
     }
 
     projects.push({
@@ -166,6 +166,65 @@ export async function installApp(
     };
 
     writeEnvFile(path.join(appDataPath, '.env'), env);
+
+    await saveJson(path.join(dockFusionPath, 'projects.json'), projects);
+
+    return true;
+}
+
+export async function editApp(_: any, options: IInstallAppSettings[], project: IProject): Promise<string | boolean> {
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+    let env: any = readEnvFile(path.join(appDataPath, '.env'));
+
+    let systemEnv: any = {};
+
+    for (const option of options) {
+        if (option.target) {
+            env[option.target] = option.value;
+        } else {
+            switch (option.type) {
+                case 'path-select':
+                    systemEnv['APP_CODE_PATH_HOST'] = option.value;
+                    break;
+
+                case 'db-credentials':
+                    systemEnv['DB_NAME'] = option.value.database;
+                    systemEnv['DB_USER'] = option.value.user;
+                    systemEnv['DB_PASSWORD'] = option.value.password;
+                    systemEnv['DB_ROOT_PASSWORD'] = option.value.password;
+                    break;
+            }
+        }
+    }
+
+    env = {
+        ...env,
+        ...systemEnv,
+    };
+
+    writeEnvFile(path.join(appDataPath, '.env'), env);
+    await writeToFile('just an empty file :)', path.join(appDataPath, 'needRebuild'));
+    return true;
+}
+
+export async function renameApp(_: any, appName: string, project: IProject): Promise<string | boolean> {
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+
+    let projects: IProject[] = [];
+    try {
+        projects = await readJson(path.join(dockFusionPath, 'projects.json'));
+    } catch (e) {}
+
+    let projectRaw = projects.find((el) => el.domain == project.domain);
+    if (!projectRaw) {
+        const error = `Project not found: ${project.domain}`;
+        console.error(error);
+        throw Error(error);
+    }
+    projectRaw.label = appName;
 
     await saveJson(path.join(dockFusionPath, 'projects.json'), projects);
 
@@ -415,7 +474,7 @@ export async function execCommandInProject(_: any, containerId: string, command:
     });
 }
 
-export async function doesExistAtProject(_: any, project: IProject, targetPath: string): Promise<boolean> {
+export async function doesExistAtProjectCodePath(_: any, project: IProject, targetPath: string): Promise<boolean> {
     const homePath = app.getPath('home');
     let dockFusionPath = path.join(homePath, homeAppDataFolderName);
     let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
@@ -427,6 +486,14 @@ export async function doesExistAtProject(_: any, project: IProject, targetPath: 
     }
 
     return doesExistUtils(path.join(env.APP_CODE_PATH_HOST, targetPath));
+}
+
+export async function doesExistAtProject(_: any, project: IProject, targetPath: string): Promise<boolean> {
+    const homePath = app.getPath('home');
+    let dockFusionPath = path.join(homePath, homeAppDataFolderName);
+    let appDataPath = path.join(dockFusionPath, 'apps', project.domain);
+
+    return doesExistUtils(path.join(appDataPath, targetPath));
 }
 
 export async function doesExist(_: any, targetPath: string): Promise<boolean> {

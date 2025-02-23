@@ -102,6 +102,7 @@ declare global {
                     options: IInstallAppSettings[],
                     marketplaceItem: IMarketplaceItem,
                 ) => Promise<string | boolean>;
+                editApp: (options: IInstallAppSettings[], project: IProject) => Promise<string | boolean>;
                 getProjectsList: () => Promise<IProject[]>;
                 getSettingsByProject: (project: IProject) => Promise<any>;
                 getEnvironmentByProject: (project: IProject) => Promise<any>;
@@ -109,8 +110,10 @@ declare global {
                 startProject: (project: IProject, forceRebuild?: boolean) => Promise<void>;
                 stopProject: (project: IProject) => Promise<void>;
                 doesExist: (targetPath: string) => Promise<boolean>;
+                doesExistAtProjectCodePath: (project: IProject, targetPath: string) => Promise<boolean>;
                 doesExistAtProject: (project: IProject, targetPath: string) => Promise<boolean>;
                 execCommandInProject: (containerId: string, command: string) => Promise<void>;
+                renameApp: (appName: string, project: IProject) => Promise<string | boolean>;
                 updateApp: (project: IProject) => Promise<void>;
                 removeApp: (project: IProject) => Promise<void>;
                 spawnTerminal: (command: string) => Promise<void>;

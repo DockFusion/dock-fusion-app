@@ -35,6 +35,9 @@ export const Self = {
     installApp: async (options: IInstallAppSettings[], marketplaceItem: IMarketplaceItem) => {
         return await window.electron.self.installApp(options, marketplaceItem);
     },
+    editApp: async (options: IInstallAppSettings[], project: IProject) => {
+        return await window.electron.self.editApp(options, project);
+    },
     getProjectsList: async () => {
         return await window.electron.self.getProjectsList();
     },
@@ -56,11 +59,17 @@ export const Self = {
     doesExist: async (targetPath: string) => {
         return await window.electron.self.doesExist(targetPath);
     },
+    doesExistAtProjectCodePath: async (project: IProject, targetPath: string) => {
+        return await window.electron.self.doesExistAtProjectCodePath(project, targetPath);
+    },
     doesExistAtProject: async (project: IProject, targetPath: string) => {
         return await window.electron.self.doesExistAtProject(project, targetPath);
     },
     execCommandInProject: async (containerId: string, command: string) => {
         return await window.electron.self.execCommandInProject(containerId, command);
+    },
+    renameApp: async (appName: string, project: IProject) => {
+        return await window.electron.self.renameApp(appName, project);
     },
     updateApp: async (project: IProject) => {
         return await window.electron.self.updateApp(project);

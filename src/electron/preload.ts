@@ -46,6 +46,7 @@ contextBridge.exposeInMainWorld('electron', {
         getVersion: async (...args: any[]) => await ipcRenderer.invoke('self.getVersion', ...args),
         showOpenDialog: async (...args: any[]) => await ipcRenderer.invoke('self.showOpenDialog', ...args),
         installApp: async (...args: any[]) => await ipcRenderer.invoke('self.installApp', ...args),
+        editApp: async (...args: any[]) => await ipcRenderer.invoke('self.editApp', ...args),
         getProjectsList: async (...args: any[]) => await ipcRenderer.invoke('self.getProjectsList', ...args),
         getSettingsByProject: async (...args: any[]) => await ipcRenderer.invoke('self.getSettingsByProject', ...args),
         getEnvironmentByProject: async (...args: any[]) =>
@@ -54,8 +55,11 @@ contextBridge.exposeInMainWorld('electron', {
         startProject: async (...args: any[]) => await ipcRenderer.invoke('self.startProject', ...args),
         stopProject: async (...args: any[]) => await ipcRenderer.invoke('self.stopProject', ...args),
         doesExist: async (...args: any[]) => await ipcRenderer.invoke('self.doesExist', ...args),
+        doesExistAtProjectCodePath: async (...args: any[]) =>
+            await ipcRenderer.invoke('self.doesExistAtProjectCodePath', ...args),
         doesExistAtProject: async (...args: any[]) => await ipcRenderer.invoke('self.doesExistAtProject', ...args),
         execCommandInProject: async (...args: any[]) => await ipcRenderer.invoke('self.execCommandInProject', ...args),
+        renameApp: async (...args: any[]) => await ipcRenderer.invoke('self.renameApp', ...args),
         updateApp: async (...args: any[]) => await ipcRenderer.invoke('self.updateApp', ...args),
         removeApp: async (...args: any[]) => await ipcRenderer.invoke('self.removeApp', ...args),
         spawnTerminal: async (...args: any[]) => await ipcRenderer.invoke('self.spawnTerminal', ...args),

@@ -3,7 +3,7 @@ import { SubjectAlternativeNameExtension } from '@peculiar/x509';
 import { exec, execSync } from 'child_process';
 import Dockerode from 'dockerode';
 import { BrowserWindow } from 'electron';
-import fs from 'fs';
+import * as fs from 'fs';
 import sudo from 'sudo-prompt';
 const os = require('os');
 const path = require('path');

@@ -85,8 +85,8 @@ export function Projects() {
             >
                 <Routes>
                     <Route path='/' element={<Typography>Select an project from the left</Typography>} />
-                    <Route path='/:projectDomain/edit/*' element={<ProjectItemEditForm projects={projects} />} />
-                    <Route path='/:projectDomain/*' element={<ProjectItem projects={projects} />} />
+                    <Route path='/:projectDomain/edit/*' element={<ProjectItemEditForm />} />
+                    <Route path='/:projectDomain/*' element={<ProjectItem />} />
                     <Route path='/*' element={<Navigate to='/home/marketplace' replace />} />
                 </Routes>
             </Container>
