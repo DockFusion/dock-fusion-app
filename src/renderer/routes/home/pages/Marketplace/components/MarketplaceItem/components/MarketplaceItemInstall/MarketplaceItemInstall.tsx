@@ -16,7 +16,7 @@ interface Props {
     marketplaceItem: IMarketplaceItem;
 }
 
-function getDefaultValue(type: string) {
+export function getDefaultValue(type: string) {
     switch (type) {
         case 'switch':
         case 'checkbox':

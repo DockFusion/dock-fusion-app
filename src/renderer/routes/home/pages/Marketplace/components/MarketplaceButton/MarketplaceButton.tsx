@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import noImage from 'src/renderer/assets/img/no_image.jpg';
 import { getLogoUrlByImage } from 'src/renderer/helpers/github';
 import { IMarketplaceItem } from 'src/shared/interfaces';
@@ -12,10 +12,12 @@ interface Props {
 export function MarketplaceButton(props: Props) {
     const [logoUrl, setLogoUrl] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
 
-    function isActive(route: string) {
-        return location.pathname.startsWith(route);
-    }
+    const isActive = useMemo(() => {
+        const route = `/home/marketplace/${props.marketplaceItem.id}`;
+        return location.pathname === route || location.pathname.startsWith(`${route}/`);
+    }, [location.pathname, props.marketplaceItem.id]);
 
     useEffect(() => {
         getLogoUrlByImage(props.marketplaceItem).then((res) => {
@@ -34,7 +36,7 @@ export function MarketplaceButton(props: Props) {
             onClick={() => {
                 navigate(`/home/marketplace/${props.marketplaceItem.id}`);
             }}
-            color={isActive(`/home/marketplace/${props.marketplaceItem.id}`) ? 'info' : undefined}
+            color={isActive ? 'info' : undefined}
         >
             {props.marketplaceItem.name}
         </Button>

@@ -1,5 +1,6 @@
 import { Card, ImageListItem, Stack, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { openExternal } from 'src/renderer/helpers/helpers';
 import { Self } from 'src/renderer/helpers/self';
 
@@ -19,6 +20,7 @@ function CardInfo(props: { title: string; children: JSX.Element }) {
 export function ProjectItemMainInfoCard(props: Props) {
     const [appPath, setAppPath] = useState('');
     const [appDataPath, setAppDataPath] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         Self.getEnvironmentByProject(props.project).then((envVars) => {
@@ -38,7 +40,16 @@ export function ProjectItemMainInfoCard(props: Props) {
         <ImageListItem>
             <Card sx={{ backgroundColor: '#252525', p: '5px', overflow: 'hidden' }}>
                 <CardInfo title={'Stack'}>
-                    <Tooltip placement='bottom' title={props.project.marketplaceItem.name}>
+                    <Tooltip
+                        placement='bottom'
+                        title={props.project.marketplaceItem.name}
+                        onClick={() => {
+                            navigate(`/home/marketplace/${props.project.marketplaceItem.id}`);
+                        }}
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                    >
                         <Typography noWrap>{props.project.marketplaceItem.name}</Typography>
                     </Tooltip>
                 </CardInfo>
@@ -80,7 +91,6 @@ export function ProjectItemMainInfoCard(props: Props) {
                             placement='bottom'
                             title={appDataPath}
                             onClick={() => {
-                                console.log(appDataPath);
                                 Self.openFolder(appDataPath);
                             }}
                             style={{

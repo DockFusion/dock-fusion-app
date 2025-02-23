@@ -3,21 +3,18 @@ import { Container, IconButton, InputAdornment, Stack, TextField, Typography } f
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { usePageLoaderContext } from 'src/renderer/components/PageLoader/usePageLoaderContext';
-import { getMarketplaceItems } from 'src/renderer/helpers/helpers';
-import { IMarketplaceItem } from 'src/shared/interfaces';
+import { useProjectsContext } from 'src/renderer/components/ProjectsProvider/useProjectsContext';
 import { MarketplaceButton } from './components/MarketplaceButton/MarketplaceButton';
 import { MarketplaceItem } from './components/MarketplaceItem/MarketplaceItem';
 
 export function Marketplace() {
     const { setLoaderVisible } = usePageLoaderContext();
-    const [marketplaceItems, setMarketplaceItems] = useState<IMarketplaceItem[]>([]);
+    const { marketplaceItems } = useProjectsContext();
     const [inited, setInited] = useState(false);
     const location = useLocation();
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-        setMarketplaceItems(getMarketplaceItems());
-
         setLoaderVisible(false);
         setInited(true);
 
@@ -85,10 +82,7 @@ export function Marketplace() {
             >
                 <Routes>
                     <Route path='/' element={<Typography>Select an item from the left</Typography>} />
-                    <Route
-                        path='/:marketplaceItemId/*'
-                        element={<MarketplaceItem marketplaceItems={marketplaceItems} />}
-                    />
+                    <Route path='/:marketplaceItemId/*' element={<MarketplaceItem />} />
                     <Route path='/*' element={<Navigate to='/home/marketplace' replace />} />
                 </Routes>
             </Container>

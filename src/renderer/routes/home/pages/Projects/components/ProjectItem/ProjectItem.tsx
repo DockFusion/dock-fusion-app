@@ -31,7 +31,6 @@ import {
     Typography,
     useTheme,
 } from '@mui/material';
-import jsyaml from 'js-yaml';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -45,7 +44,6 @@ import {
     downloadSourceFileFromGithubByImage,
     getGithubLastVersion,
     getLogoUrlByProject,
-    getSettingsByProject,
 } from 'src/renderer/helpers/github';
 import { sleep } from 'src/renderer/helpers/helpers';
 import { Self } from 'src/renderer/helpers/self';
@@ -61,8 +59,6 @@ export function ProjectItem(props: Props) {
     const [logoUrl, setLogoUrl] = useState('');
     const [version, setVersion] = useState('');
     const [lastVersion, setLastVersion] = useState('');
-    const [settings, setSettings] = useState<any>('');
-    const [settingsLoading, setSettingsLoading] = useState(false);
     const [sidebarMenuOpen, setSidebarMenuOpen] = useState(false);
     const [versionUpdatedCounter, setVersionUpdatedCounter] = useState(0);
     const navigate = useNavigate();
@@ -86,10 +82,6 @@ export function ProjectItem(props: Props) {
             return;
         }
 
-        getSettingsByProject(project).then((res) => {
-            setSettings(jsyaml.load(res) ?? '');
-            setSettingsLoading(false);
-        });
         getLogoUrlByProject(project).then((res) => {
             setLogoUrl(res);
         });
@@ -108,6 +100,10 @@ export function ProjectItem(props: Props) {
     }, [project, versionUpdatedCounter]);
 
     const versionsMismatch = useMemo(() => {
+        if (project == null || version === '' || lastVersion === '') {
+            return true;
+        }
+
         if (version !== lastVersion) {
             console.warn(`Versions mismatch: [${version}] != [${lastVersion}]`);
         }
@@ -243,6 +239,16 @@ export function ProjectItem(props: Props) {
                         >
                             <Box sx={{ width: '100%' }}>
                                 <Stack direction={'row'} justifyContent={'flex-end'} sx={{ my: '5px' }}>
+                                    {/* <Tooltip title='Edit configuration'>
+                                        <IconButton
+                                            onClick={() => {
+                                                navigate(`/home/projects/${project.domain}/edit`);
+                                            }}
+                                            sx={{ width: 'fit-content' }}
+                                        >
+                                            <Edit />
+                                        </IconButton>
+                                    </Tooltip> */}
                                     <Tooltip title='Open configuration folder'>
                                         <IconButton
                                             onClick={() => {

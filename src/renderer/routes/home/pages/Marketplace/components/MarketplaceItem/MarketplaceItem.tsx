@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import noImage from 'src/renderer/assets/img/no_image.jpg';
 import { usePageLoaderContext } from 'src/renderer/components/PageLoader/usePageLoaderContext';
+import { useProjectsContext } from 'src/renderer/components/ProjectsProvider/useProjectsContext';
 import {
     getGithubLastVersion,
     getLogoUrlByImage,
@@ -15,9 +16,7 @@ import { IMarketplaceItem } from 'src/shared/interfaces';
 import { MarketplaceItemInfo } from './components/MarketplaceItemInfo/MarketplaceItemInfo';
 import { MarketplaceItemInstall } from './components/MarketplaceItemInstall/MarketplaceItemInstall';
 
-interface Props {
-    marketplaceItems: IMarketplaceItem[];
-}
+interface Props {}
 
 export function MarketplaceItem(props: Props) {
     const [logoUrl, setLogoUrl] = useState('');
@@ -31,6 +30,7 @@ export function MarketplaceItem(props: Props) {
     const navigate = useNavigate();
     const location = useLocation();
     const { setLoaderVisible } = usePageLoaderContext();
+    const { marketplaceItems } = useProjectsContext();
 
     const inInstallForm = useMemo(() => {
         return location.pathname.startsWith(`/home/marketplace/${marketplaceItemId}/install`);
@@ -39,7 +39,7 @@ export function MarketplaceItem(props: Props) {
     useEffect(() => {
         setMarkdownLoading(true);
         setSettingsLoading(true);
-        const marketplaceItem = props.marketplaceItems.find((el) => el.id == marketplaceItemId);
+        const marketplaceItem = marketplaceItems.find((el) => el.id == marketplaceItemId);
 
         if (marketplaceItem == null) {
             navigate('/home/marketplace');

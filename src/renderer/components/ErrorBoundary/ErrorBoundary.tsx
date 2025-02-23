@@ -1,15 +1,5 @@
 import { Error } from '@mui/icons-material';
-import {
-    Box,
-    Button,
-    Container,
-    CssBaseline,
-    FormControlLabel,
-    Grid2 as Grid,
-    Paper,
-    Switch,
-    Typography,
-} from '@mui/material';
+import { Box, Button, Container, CssBaseline, Grid2 as Grid, Paper, Typography } from '@mui/material';
 import { Component } from 'react';
 import { i18n } from 'src/renderer/i18n';
 
@@ -70,19 +60,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, any> {
                                             <Typography variant='h5'>{i18n.t('info.error')}</Typography>
                                         </Grid>
                                         <Grid size={12}>
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        checked={this.state.clearCache}
-                                                        onChange={(e, checked) => {
-                                                            this.setState({
-                                                                clearCache: checked,
-                                                            });
-                                                        }}
-                                                    />
-                                                }
-                                                label={i18n.t('label.clear_cache')}
-                                            />
                                             <Box
                                                 sx={{
                                                     display: 'flex',
@@ -96,7 +73,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, any> {
                                                         window.location.reload();
                                                     }}
                                                 >
-                                                    {i18n.t('label.refresh_page')}
+                                                    {i18n.t('label.refresh_window')}
                                                 </Button>
                                             </Box>
                                         </Grid>

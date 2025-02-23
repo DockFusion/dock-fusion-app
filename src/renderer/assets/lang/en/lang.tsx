@@ -3,4 +3,5 @@ export const translations: any = {
     general: require('./general.json'),
     entrypoint: require('./entrypoint.json'),
     label: require('./label.json'),
+    info: require('./info.json'),
 };

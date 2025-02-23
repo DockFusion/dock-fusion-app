@@ -1,7 +1,7 @@
 import { Circle } from '@mui/icons-material';
 import { Button, Tooltip, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import noImage from 'src/renderer/assets/img/no_image.jpg';
 import { useDockerStatusTrackerContext } from 'src/renderer/components/DockerStatusTracker/useDockerStatusTrackerContext';
 import { getLogoUrlByProject } from 'src/renderer/helpers/github';
@@ -14,10 +14,12 @@ export function ProjectsButton(props: Props) {
     const [logoUrl, setLogoUrl] = useState('');
     const navigate = useNavigate();
     const { containerStatusColor } = useDockerStatusTrackerContext({ project: props.project });
+    const location = useLocation();
 
-    function isActive(route: string) {
+    const isActive = useMemo(() => {
+        const route = `/home/projects/${props.project.domain}`;
         return location.pathname === route || location.pathname.startsWith(`${route}/`);
-    }
+    }, [location.pathname, props.project.domain]);
 
     useEffect(() => {
         getLogoUrlByProject(props.project).then((res) => {
@@ -44,7 +46,7 @@ export function ProjectsButton(props: Props) {
                 onClick={() => {
                     navigate(`/home/projects/${props.project.domain}`);
                 }}
-                color={isActive(`/home/projects/${props.project.domain}`) ? 'info' : undefined}
+                color={isActive ? 'info' : undefined}
             >
                 <Typography noWrap>{props.project.name}</Typography>
             </Button>

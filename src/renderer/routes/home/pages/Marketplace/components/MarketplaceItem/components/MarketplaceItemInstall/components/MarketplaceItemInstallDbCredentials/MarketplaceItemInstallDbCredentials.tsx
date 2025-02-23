@@ -9,9 +9,9 @@ interface Props {
 }
 
 export function MarketplaceItemInstallDbCredentials(props: Props) {
-    const [database, setDatabase] = useState('');
-    const [user, setUser] = useState('');
-    const [password, setPassword] = useState('');
+    const [database, setDatabase] = useState(props.value?.database ?? '');
+    const [user, setUser] = useState(props.value?.user ?? '');
+    const [password, setPassword] = useState(props.value?.password ?? '');
 
     useEffect(() => {
         setDatabase(props.value?.database ?? '');

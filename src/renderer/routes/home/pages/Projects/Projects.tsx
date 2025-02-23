@@ -5,6 +5,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { usePageLoaderContext } from 'src/renderer/components/PageLoader/usePageLoaderContext';
 import { useProjectsContext } from 'src/renderer/components/ProjectsProvider/useProjectsContext';
 import { ProjectItem } from './components/ProjectItem/ProjectItem';
+import { ProjectItemEditForm } from './components/ProjectItemEditForm/ProjectItemEditForm';
 import { ProjectsButton } from './components/ProjectsButton/ProjectsButton';
 
 export function Projects() {
@@ -84,6 +85,7 @@ export function Projects() {
             >
                 <Routes>
                     <Route path='/' element={<Typography>Select an project from the left</Typography>} />
+                    <Route path='/:projectDomain/edit/*' element={<ProjectItemEditForm projects={projects} />} />
                     <Route path='/:projectDomain/*' element={<ProjectItem projects={projects} />} />
                     <Route path='/*' element={<Navigate to='/home/marketplace' replace />} />
                 </Routes>

@@ -14,15 +14,15 @@ register({
 import { app, BrowserWindow, Menu, nativeImage, net, protocol, shell, Tray } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { appName, homeAppDataFolderName } from 'src/shared/constants';
-import './electron/ipcMain/child_process';
-import './electron/ipcMain/detectEditors';
-import './electron/ipcMain/detectShells';
-import './electron/ipcMain/dockerode';
-import './electron/ipcMain/github';
-import './electron/ipcMain/self';
-import './electron/ipcMain/shell';
-import './electron/ipcMain/windows';
-import './electron/ipcMain/wsl';
+import './electron/ipcMain/child_process/child_process';
+import './electron/ipcMain/detectEditors/detectEditors';
+import './electron/ipcMain/detectShells/detectShells';
+import './electron/ipcMain/dockerode/dockerode';
+import './electron/ipcMain/github/github';
+import './electron/ipcMain/self/self';
+import './electron/ipcMain/shell/shell';
+import './electron/ipcMain/windows/windows';
+import './electron/ipcMain/wsl/wsl';
 import { isDarwin, trackContainerStatus } from './electron/utils';
 
 function isDev() {

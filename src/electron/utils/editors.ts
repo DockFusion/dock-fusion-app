@@ -72,18 +72,6 @@ function getEditorName(editor: Editor): string {
     }
 }
 
-// async function getRegistryValue(key: string): Promise<string | undefined> {
-//     return new Promise((resolve, reject) => {
-//       regedit.list(key, (err, result) => {
-//         if (err || !result[key]) {
-//           resolve(undefined);
-//         } else {
-//           resolve(result[key].values['InstallLocation']?.value);
-//         }
-//       });
-//     });
-//   }
-
 // List of editors and their corresponding command-line invocations
 const editors = [
     { editor: Editor.VisualStudioCode, cmd: 'code' },

@@ -1,18 +1,6 @@
 import { exec } from 'child_process';
-import { ipcMain } from 'electron';
 
-interface WSLStatus {
-    defaultDistribution: string | null;
-    defaultVersion: string | null;
-}
-
-interface WSLDistribution {
-    name: string;
-    state: string;
-    version: string;
-}
-
-ipcMain.handle('wsl.getStatus', async function () {
+export async function getStatus() {
     return new Promise<WSLStatus>((resolve, reject) => {
         exec('wsl --status', { shell: 'cmd.exe', encoding: 'utf16le' }, (err, stdout, stderr) => {
             if (err) {
@@ -31,9 +19,9 @@ ipcMain.handle('wsl.getStatus', async function () {
             });
         });
     });
-});
+}
 
-ipcMain.handle('wsl.getDistributions', async function () {
+export async function getDistributions() {
     return new Promise<WSLDistribution[]>((resolve, reject) => {
         exec('wsl -l -v', { shell: 'cmd.exe', encoding: 'utf16le' }, (err, stdout, stderr) => {
             if (err) {
@@ -70,9 +58,9 @@ ipcMain.handle('wsl.getDistributions', async function () {
             resolve(distributions as WSLDistribution[]);
         });
     });
-});
+}
 
-ipcMain.handle('wsl.install', async function () {
+export async function install() {
     return new Promise<boolean>((resolve, reject) => {
         exec('wsl --install  --no-distribution', { shell: 'cmd.exe', encoding: 'utf16le' }, (err, stdout, stderr) => {
             if (err) {
@@ -85,9 +73,9 @@ ipcMain.handle('wsl.install', async function () {
             resolve(true);
         });
     });
-});
+}
 
-ipcMain.handle('wsl.setDefault', async function (_: any, distributionName: string) {
+export async function setDefault(_: any, distributionName: string) {
     return new Promise<boolean>((resolve, reject) => {
         exec(
             `wsl --set-default ${distributionName}`,
@@ -104,26 +92,28 @@ ipcMain.handle('wsl.setDefault', async function (_: any, distributionName: strin
             },
         );
     });
-});
+}
 
-ipcMain.handle(
-    'wsl.import',
-    async function (_: any, distributionName: string, distributionPath: string, fileToImportPath: string) {
-        return new Promise<boolean>((resolve, reject) => {
-            exec(
-                `wsl --import ${distributionName} ${distributionPath} ${fileToImportPath}`,
-                { shell: 'cmd.exe', encoding: 'utf16le' },
-                (err, stdout, stderr) => {
-                    if (err) {
-                        resolve(false);
-                    }
-                    if (stderr) {
-                        resolve(false);
-                    }
+export async function importDistribution(
+    _: any,
+    distributionName: string,
+    distributionPath: string,
+    fileToImportPath: string,
+) {
+    return new Promise<boolean>((resolve, reject) => {
+        exec(
+            `wsl --import ${distributionName} ${distributionPath} ${fileToImportPath}`,
+            { shell: 'cmd.exe', encoding: 'utf16le' },
+            (err, stdout, stderr) => {
+                if (err) {
+                    resolve(false);
+                }
+                if (stderr) {
+                    resolve(false);
+                }
 
-                    resolve(true);
-                },
-            );
-        });
-    },
-);
+                resolve(true);
+            },
+        );
+    });
+}

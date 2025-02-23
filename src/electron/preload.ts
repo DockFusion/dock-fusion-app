@@ -1,105 +1,75 @@
-import { OpenDialogOptions } from 'electron';
-import { IInstallAppSettings, IMarketplaceItem, IProject } from 'src/shared/interfaces';
-
-/**
- * The preload script runs before `index.html` is loaded
- * in the renderer. It has access to web APIs as well as
- * Electron's renderer process modules and some polyfilled
- * Node.js functions.
- *
- * https://www.electronjs.org/docs/latest/tutorial/sandbox
- */
 const { contextBridge, ipcRenderer } = require('electron');
-
-window.addEventListener('DOMContentLoaded', () => {
-    const replaceText = (selector: any, text: any) => {
-        const element = document.getElementById(selector);
-        if (element) element.innerText = text;
-    };
-
-    for (const type of ['chrome', 'node', 'electron']) {
-        replaceText(`${type}-version`, process.versions[type]);
-    }
-});
 
 contextBridge.exposeInMainWorld('electron', {
     childProcess: {
-        execSync: async (command: any) => await ipcRenderer.invoke('child_process.execSync', command),
-        exec: async (command: any, callback: any) => ipcRenderer.invoke('child_process.exec', command, callback),
+        execSync: async (...args: any[]) => await ipcRenderer.invoke('child_process.execSync', ...args),
+        exec: async (...args: any[]) => ipcRenderer.invoke('child_process.exec', ...args),
     },
     docker: {
-        info: async () => await ipcRenderer.invoke('dockerode.info'),
-        version: async () => await ipcRenderer.invoke('dockerode.version'),
-        listContainers: async () => await ipcRenderer.invoke('dockerode.listContainers'),
-        inpectContainer: async (containerId: string) =>
-            await ipcRenderer.invoke('dockerode.inpectContainer', containerId),
+        info: async (...args: any[]) => await ipcRenderer.invoke('dockerode.info', ...args),
+        version: async (...args: any[]) => await ipcRenderer.invoke('dockerode.version', ...args),
+        listContainers: async (...args: any[]) => await ipcRenderer.invoke('dockerode.listContainers', ...args),
+        inpectContainer: async (...args: any[]) => await ipcRenderer.invoke('dockerode.inpectContainer', ...args),
     },
     windows: {
-        isDockerDesktopInstalled: async () => await ipcRenderer.invoke('windows.isDockerDesktopInstalled'),
-        openDockerDesktop: async () => await ipcRenderer.invoke('windows.openDockerDesktop'),
-        release: async () => await ipcRenderer.invoke('windows.release'),
-        getBuildNumber: async () => await ipcRenderer.invoke('windows.getBuildNumber'),
-        downloadFile: async (url: string, downloadPath?: string, outputFileName?: string) =>
-            await ipcRenderer.invoke('windows.downloadFile', url, downloadPath, outputFileName),
-        delete: async (deletePath: string) => await ipcRenderer.invoke('windows.delete', deletePath),
-        installDependencies: async () => await ipcRenderer.invoke('windows.installDependencies'),
-        checkDependencies: async () => await ipcRenderer.invoke('windows.checkDependencies'),
+        isDockerDesktopInstalled: async (...args: any[]) =>
+            await ipcRenderer.invoke('windows.isDockerDesktopInstalled', ...args),
+        openDockerDesktop: async (...args: any[]) => await ipcRenderer.invoke('windows.openDockerDesktop', ...args),
+        release: async (...args: any[]) => await ipcRenderer.invoke('windows.release', ...args),
+        getBuildNumber: async (...args: any[]) => await ipcRenderer.invoke('windows.getBuildNumber', ...args),
+        downloadFile: async (...args: any[]) => await ipcRenderer.invoke('windows.downloadFile', ...args),
+        delete: async (...args: any[]) => await ipcRenderer.invoke('windows.delete', ...args),
+        installDependencies: async (...args: any[]) => await ipcRenderer.invoke('windows.installDependencies', ...args),
+        checkDependencies: async (...args: any[]) => await ipcRenderer.invoke('windows.checkDependencies', ...args),
     },
     wsl: {
-        getStatus: async () => await ipcRenderer.invoke('wsl.getStatus'),
-        getDistributions: async () => await ipcRenderer.invoke('wsl.getDistributions'),
-        install: async () => await ipcRenderer.invoke('wsl.install'),
-        setDefault: async (distribution: string) => await ipcRenderer.invoke('wsl.setDefault', distribution),
-        import: async (distributionName: string, distributionPath: string, fileToImportPath: string) =>
-            await ipcRenderer.invoke('wsl.import', distributionName, distributionPath, fileToImportPath),
+        getStatus: async (...args: any[]) => await ipcRenderer.invoke('wsl.getStatus', ...args),
+        getDistributions: async (...args: any[]) => await ipcRenderer.invoke('wsl.getDistributions', ...args),
+        install: async (...args: any[]) => await ipcRenderer.invoke('wsl.install', ...args),
+        setDefault: async (...args: any[]) => await ipcRenderer.invoke('wsl.setDefault', ...args),
+        import: async (...args: any[]) => await ipcRenderer.invoke('wsl.import', ...args),
     },
     shell: {
-        openExternal: async (url: string, options?: Electron.OpenExternalOptions) =>
-            await ipcRenderer.invoke('shell.openExternal', url, options),
+        openExternal: async (...args: any[]) => await ipcRenderer.invoke('shell.openExternal', ...args),
     },
     detectEditors: {
-        getAvailableEditors: async () => await ipcRenderer.invoke('detectEditors.getAvailableEditors'),
+        getAvailableEditors: async (...args: any[]) =>
+            await ipcRenderer.invoke('detectEditors.getAvailableEditors', ...args),
     },
     detectShells: {
-        getAvailableShells: async () => await ipcRenderer.invoke('detectShells.getAvailableShells'),
+        getAvailableShells: async (...args: any[]) =>
+            await ipcRenderer.invoke('detectShells.getAvailableShells', ...args),
     },
     self: {
-        restart: async () => await ipcRenderer.invoke('self.restart'),
-        getPath: async (name: string) => await ipcRenderer.invoke('self.getPath', name),
-        getVersion: async () => await ipcRenderer.invoke('self.getVersion'),
-        showOpenDialog: async (options: OpenDialogOptions) => await ipcRenderer.invoke('self.showOpenDialog', options),
-        installApp: async (options: IInstallAppSettings[], marketplaceItem: IMarketplaceItem) =>
-            await ipcRenderer.invoke('self.installApp', options, marketplaceItem),
-        getProjectsList: async () => await ipcRenderer.invoke('self.getProjectsList'),
-        getSettingsByProject: async (project: IProject) =>
-            await ipcRenderer.invoke('self.getSettingsByProject', project),
-        getEnvironmentByProject: async (project: IProject) =>
-            await ipcRenderer.invoke('self.getEnvironmentByProject', project),
-        readProjectFile: async (project: IProject, filePath: string) =>
-            await ipcRenderer.invoke('self.readProjectFile', project, filePath),
-        startProject: async (project: IProject, forceRebuild?: boolean) =>
-            await ipcRenderer.invoke('self.startProject', project, forceRebuild),
-        stopProject: async (project: IProject) => await ipcRenderer.invoke('self.stopProject', project),
-        doesExist: async (targetPath: string) => await ipcRenderer.invoke('self.doesExist', targetPath),
-        doesExistAtProject: async (project: IProject, targetPath: string) =>
-            await ipcRenderer.invoke('self.doesExistAtProject', project, targetPath),
-        execCommandInProject: async (containerId: string, command: string) =>
-            await ipcRenderer.invoke('self.execCommandInProject', containerId, command),
-        updateApp: async (project: IProject) => await ipcRenderer.invoke('self.updateApp', project),
-        removeApp: async (project: IProject) => await ipcRenderer.invoke('self.removeApp', project),
-        spawnTerminal: async (command: string) => await ipcRenderer.invoke('self.spawnTerminal', command),
-        spawnTerminalAtProject: async (project: IProject, command: string) =>
-            await ipcRenderer.invoke('self.spawnTerminalAtProject', project, command),
-        spawnLogsAtProject: async (project: IProject) => await ipcRenderer.invoke('self.spawnLogsAtProject', project),
-        openFolder: async (targetPath: string) => await ipcRenderer.invoke('self.openFolder', targetPath),
-        openProjectAppDataFolder: async (project: IProject) =>
-            await ipcRenderer.invoke('self.openProjectAppDataFolder', project),
+        restart: async (...args: any[]) => await ipcRenderer.invoke('self.restart', ...args),
+        getPath: async (...args: any[]) => await ipcRenderer.invoke('self.getPath', ...args),
+        getVersion: async (...args: any[]) => await ipcRenderer.invoke('self.getVersion', ...args),
+        showOpenDialog: async (...args: any[]) => await ipcRenderer.invoke('self.showOpenDialog', ...args),
+        installApp: async (...args: any[]) => await ipcRenderer.invoke('self.installApp', ...args),
+        getProjectsList: async (...args: any[]) => await ipcRenderer.invoke('self.getProjectsList', ...args),
+        getSettingsByProject: async (...args: any[]) => await ipcRenderer.invoke('self.getSettingsByProject', ...args),
+        getEnvironmentByProject: async (...args: any[]) =>
+            await ipcRenderer.invoke('self.getEnvironmentByProject', ...args),
+        readProjectFile: async (...args: any[]) => await ipcRenderer.invoke('self.readProjectFile', ...args),
+        startProject: async (...args: any[]) => await ipcRenderer.invoke('self.startProject', ...args),
+        stopProject: async (...args: any[]) => await ipcRenderer.invoke('self.stopProject', ...args),
+        doesExist: async (...args: any[]) => await ipcRenderer.invoke('self.doesExist', ...args),
+        doesExistAtProject: async (...args: any[]) => await ipcRenderer.invoke('self.doesExistAtProject', ...args),
+        execCommandInProject: async (...args: any[]) => await ipcRenderer.invoke('self.execCommandInProject', ...args),
+        updateApp: async (...args: any[]) => await ipcRenderer.invoke('self.updateApp', ...args),
+        removeApp: async (...args: any[]) => await ipcRenderer.invoke('self.removeApp', ...args),
+        spawnTerminal: async (...args: any[]) => await ipcRenderer.invoke('self.spawnTerminal', ...args),
+        spawnTerminalAtProject: async (...args: any[]) =>
+            await ipcRenderer.invoke('self.spawnTerminalAtProject', ...args),
+        spawnLogsAtProject: async (...args: any[]) => await ipcRenderer.invoke('self.spawnLogsAtProject', ...args),
+        openFolder: async (...args: any[]) => await ipcRenderer.invoke('self.openFolder', ...args),
+        openProjectAppDataFolder: async (...args: any[]) =>
+            await ipcRenderer.invoke('self.openProjectAppDataFolder', ...args),
     },
     github: {
-        downloadMarketplaceFile: async (downloadUrl: string, github: string, filePath: string) =>
-            await ipcRenderer.invoke('github.downloadMarketplaceFile', downloadUrl, github, filePath),
-        readMarketplaceFile: async (github: string, filePath: string) =>
-            await ipcRenderer.invoke('github.readMarketplaceFile', github, filePath),
+        downloadMarketplaceFile: async (...args: any[]) =>
+            await ipcRenderer.invoke('github.downloadMarketplaceFile', ...args),
+        readMarketplaceFile: async (...args: any[]) => await ipcRenderer.invoke('github.readMarketplaceFile', ...args),
     },
     api: {
         send: (channel: string, data: any) => {
