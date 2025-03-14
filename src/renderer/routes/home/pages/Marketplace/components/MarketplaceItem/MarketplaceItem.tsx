@@ -1,16 +1,19 @@
-import { ArrowBack, Download } from '@mui/icons-material';
-import { Button, Chip, CircularProgress, Container, Stack, Toolbar, Typography } from '@mui/material';
+import { ArrowBack, Download, Refresh } from '@mui/icons-material';
+import { Button, Chip, CircularProgress, Container, IconButton, Stack, Toolbar, Typography } from '@mui/material';
 import jsyaml from 'js-yaml';
-import { useEffect, useMemo, useState } from 'react';
+import { enqueueSnackbar } from 'notistack';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import noImage from 'src/renderer/assets/img/no_image.jpg';
 import { usePageLoaderContext } from 'src/renderer/components/PageLoader/usePageLoaderContext';
 import { useProjectsContext } from 'src/renderer/components/ProjectsProvider/useProjectsContext';
 import {
     getGithubLastVersion,
+    getGithubTags,
     getLogoUrlByImage,
     getReadMeByImage,
     getSettingsByImage,
+    resetGithubTags,
 } from 'src/renderer/helpers/github';
 import { IMarketplaceItem } from 'src/shared/interfaces';
 import { MarketplaceItemInfo } from './components/MarketplaceItemInfo/MarketplaceItemInfo';
@@ -31,6 +34,11 @@ export function MarketplaceItem(props: Props) {
     const location = useLocation();
     const { setLoaderVisible } = usePageLoaderContext();
     const { marketplaceItems } = useProjectsContext();
+    const [refreshGithubVersionButtonVisible, setRefreshGithubVersionButtonVisible] = useState(false);
+    const [refreshGithubVersionLoading, setRefreshGithubVersionLoading] = useState(false);
+    const [refreshGithubVersionCounter, setRefreshGithubVersionCounter] = useState(0);
+    const refreshGithubVersionCounterRef = useRef(refreshGithubVersionCounter);
+    refreshGithubVersionCounterRef.current = refreshGithubVersionCounter;
 
     const inInstallForm = useMemo(() => {
         return location.pathname.startsWith(`/home/marketplace/${marketplaceItemId}/install`);
@@ -65,7 +73,7 @@ export function MarketplaceItem(props: Props) {
         return () => {
             setLoaderVisible(true);
         };
-    }, [marketplaceItemId]);
+    }, [marketplaceItems, marketplaceItemId, refreshGithubVersionCounter]);
 
     return (
         <Stack sx={{ overflow: 'hidden' }} direction={'column'} height={'100%'} width={'100%'}>
@@ -86,8 +94,32 @@ export function MarketplaceItem(props: Props) {
                     <Stack height={'100%'} justifyContent={'start'} direction={'column'}>
                         <Stack direction={'row'} gap={'10px'} alignItems={'end'}>
                             <Typography variant='h6'>{marketplaceItem.name}</Typography>
-                            <Typography variant='body2' sx={{ textDecoration: 'underline' }}>
+                            <Typography
+                                variant='body2'
+                                sx={{ textDecoration: 'underline' }}
+                                onMouseEnter={() => setRefreshGithubVersionButtonVisible(true)}
+                                onMouseLeave={() => setRefreshGithubVersionButtonVisible(false)}
+                            >
                                 {version}
+                                {refreshGithubVersionButtonVisible && (
+                                    <IconButton
+                                        loading={refreshGithubVersionLoading}
+                                        size='small'
+                                        sx={{ p: 0, ml: '3px' }}
+                                        onClick={async () => {
+                                            setRefreshGithubVersionLoading(true);
+                                            resetGithubTags(marketplaceItem.github);
+                                            await getGithubTags(marketplaceItem.github);
+                                            setRefreshGithubVersionCounter(refreshGithubVersionCounterRef.current + 1);
+                                            setRefreshGithubVersionLoading(false);
+                                            enqueueSnackbar(`[${marketplaceItem.name}] Version updated`, {
+                                                variant: 'success',
+                                            });
+                                        }}
+                                    >
+                                        <Refresh fontSize='small' />
+                                    </IconButton>
+                                )}
                             </Typography>
                         </Stack>
                         <Typography variant='body2'>{marketplaceItem.description}</Typography>

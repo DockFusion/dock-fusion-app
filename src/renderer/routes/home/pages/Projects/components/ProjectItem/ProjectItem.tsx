@@ -8,8 +8,18 @@ import {
     Stop,
     Warning,
 } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
-import { Box, Container, Drawer, IconButton, ImageList, Stack, Toolbar, Tooltip, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Container,
+    Drawer,
+    IconButton,
+    ImageList,
+    Stack,
+    Toolbar,
+    Tooltip,
+    Typography,
+} from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -155,7 +165,7 @@ export function ProjectItem(props: Props) {
                                 ProjectStatus.error,
                                 ProjectStatus.starting,
                             ].includes(containerStatus) && (
-                                <LoadingButton
+                                <Button
                                     startIcon={<PlayArrow />}
                                     loadingPosition='start'
                                     loading={containerStatus === ProjectStatus.starting}
@@ -173,10 +183,10 @@ export function ProjectItem(props: Props) {
                                     }}
                                 >
                                     {'Start'}
-                                </LoadingButton>
+                                </Button>
                             )}
                             {[ProjectStatus.running, ProjectStatus.stopping].includes(containerStatus) && (
-                                <LoadingButton
+                                <Button
                                     startIcon={<Stop />}
                                     loadingPosition='start'
                                     loading={containerStatus === ProjectStatus.stopping}
@@ -194,7 +204,7 @@ export function ProjectItem(props: Props) {
                                     }}
                                 >
                                     {'Stop'}
-                                </LoadingButton>
+                                </Button>
                             )}
                         </Stack>
                         <Stack direction={'row'} gap={'10px'}>

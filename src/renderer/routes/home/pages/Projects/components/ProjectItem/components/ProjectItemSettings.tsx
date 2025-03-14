@@ -128,6 +128,7 @@ export function ProjectItemSettings(props: Props) {
                                                                         variant: 'success',
                                                                     },
                                                                 );
+                                                                refreshProjects();
                                                             })
                                                             .catch(() => {
                                                                 enqueueSnackbar(
@@ -235,7 +236,9 @@ export function ProjectItemSettings(props: Props) {
                         justifyContent: 'center',
                     }}
                 >
-                    <RenameAppForm project={project} onClose={() => setRenameAppFormOpen(false)} />
+                    <div>
+                        <RenameAppForm project={project} onClose={() => setRenameAppFormOpen(false)} />
+                    </div>
                 </Modal>
             </ListItem>
             {[ProjectStatus.stopped, ProjectStatus.unknown, ProjectStatus.error, ProjectStatus.starting].includes(

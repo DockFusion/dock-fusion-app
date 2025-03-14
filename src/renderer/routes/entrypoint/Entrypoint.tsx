@@ -11,6 +11,7 @@ import loader from 'src/renderer/assets/lottiefiles/lf20_rj4titti.json';
 import { AllSetAndDone } from './components/AllSetAndDone/AllSetAndDone';
 import { DependenciesInstall } from './components/DependenciesInstall/DependenciesInstall';
 import { DockerInstall } from './components/DockerInstall/DockerInstall';
+import { FinalAdjustments } from './components/FinalAdjustments/FinalAdjustments';
 import { WSLInstall } from './components/WSLInstall/WSLInstall';
 
 const drawerWidth = 290;
@@ -34,6 +35,10 @@ export function Entrypoint() {
         {
             label: 'Dependencies Installation',
             step: <DependenciesInstall nextStep={nextStep} />,
+        },
+        {
+            label: 'Final Adjustments',
+            step: <FinalAdjustments nextStep={nextStep} />,
         },
         {
             label: 'All set & done',

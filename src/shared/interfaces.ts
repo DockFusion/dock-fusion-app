@@ -6,9 +6,7 @@ export interface IMarketplaceItem {
     logo: string;
     description: string;
     tags: string[];
-    website: string;
     github: string;
-    version: string;
 }
 
 export interface IInstallAppSettings {

@@ -5,9 +5,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/laravel/main/default.png",
         "description": "Laravel is a web application framework for PHP, released as free and open-source software under the MIT License.",
         "tags": ["laravel", "php"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/laravel",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/laravel"
     },
     {
         "id": "wordpress-16022021",
@@ -15,9 +13,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/wordpress/main/default.png",
         "description": "Open source software you can use to create a beautiful website, blog, or app",
         "tags": ["wordpress", "php"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/wordpress",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/wordpress"
     },
     {
         "id": "postgres-17022021",
@@ -25,9 +21,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/postgres/main/default.png",
         "description": "Advanced open source relational database",
         "tags": ["postgre", "db", "database"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/postgre",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/postgre"
     },
     {
         "id": "mysql-17022021",
@@ -35,9 +29,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/mysql/main/default.png",
         "description": "Popular open source database",
         "tags": ["mysql", "db", "database"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/mysql",
-        "version": "v2.0.4"
+        "github": "DockFusion-Marketplace/mysql"
     },
     {
         "id": "nodejs-17022021",
@@ -45,9 +37,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/nodejs/main/default.png",
         "description": "",
         "tags": ["nodejs", "node"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/nodejs",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/nodejs"
     },
     {
         "id": "mongodb-17022021",
@@ -55,9 +45,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/mongodb/main/default.png",
         "description": "",
         "tags": ["mongodb", "db", "database"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/mongodb",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/mongodb"
     },
     {
         "id": "mailhog-17022021",
@@ -65,9 +53,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/mailhog/main/default.png",
         "description": "Web and API based SMTP testing",
         "tags": ["email", "mailhog"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/mailhog",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/mailhog"
     },
     {
         "id": "redis-17012022",
@@ -75,9 +61,7 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/redis/main/default.png",
         "description": "Redis is an open-source, networked, in-memory, key-value data store with optional durability. It is written in ANSI C",
         "tags": ["redis", "db", "database", "cache"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/redis",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/redis"
     },
     {
         "id": "mariadb-31012022",
@@ -85,8 +69,6 @@
         "logo": "https://raw.githubusercontent.com/DockFusion-Marketplace/mariadb/main/default.png",
         "description": "MariaDB Server is one of the most popular open source database server",
         "tags": ["mariadb", "db", "database"],
-        "website": "https://get-deck.com",
-        "github": "DockFusion-Marketplace/mariadb",
-        "version": "beta"
+        "github": "DockFusion-Marketplace/mariadb"
     }
 ]

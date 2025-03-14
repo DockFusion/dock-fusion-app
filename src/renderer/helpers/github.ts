@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { SemVer } from 'semver';
 import { IMarketplaceItem, IProject } from 'src/shared/interfaces';
 
@@ -10,7 +11,36 @@ export const Github = {
     },
 };
 
+export function resetGithubTagsOnceByDay() {
+    const lastStartupRaw = localStorage.getItem('lastStartup');
+    const lastStartup = moment(lastStartupRaw);
+    const today = moment();
+    if (!lastStartupRaw || lastStartup.isBefore(today, 'day')) {
+        resetGithubTags();
+        localStorage.setItem('lastStartup', today.format());
+    }
+}
+
+export function resetGithubTags(github: string = null) {
+    if (github) {
+        if (Object.keys((window as any).githubTagsUpdates).includes(github)) {
+            delete (window as any).githubTagsUpdates[github];
+            localStorage.setItem('githubTagsUpdates', JSON.stringify((window as any).githubTagsUpdates));
+        }
+    } else {
+        (window as any).githubTagsUpdates = {};
+        localStorage.removeItem('githubTagsUpdates');
+    }
+}
+
 export async function getGithubTags(github: string) {
+    if ((window as any).githubTagsUpdates == null) {
+        let githubTagsUpdates = JSON.parse(localStorage.getItem('githubTagsUpdates')) ?? {};
+        if (typeof githubTagsUpdates !== 'object' || Array.isArray(githubTagsUpdates)) {
+            githubTagsUpdates = {};
+        }
+        (window as any).githubTagsUpdates = githubTagsUpdates;
+    }
     if ((window as any).githubTags == null) {
         let githubTags = JSON.parse(localStorage.getItem('githubTags')) ?? {};
         if (typeof githubTags !== 'object' || Array.isArray(githubTags)) {
@@ -18,7 +48,8 @@ export async function getGithubTags(github: string) {
         }
         (window as any).githubTags = githubTags;
     }
-    if ((window as any).githubTags[github] != null) {
+
+    if ((window as any).githubTagsUpdates[github] && (window as any).githubTags[github] != null) {
         return (window as any).githubTags[github];
     }
     let gitApiUrl = `https://api.github.com/repos/${github}/tags`;
@@ -27,15 +58,20 @@ export async function getGithubTags(github: string) {
     const data = await response.json();
     let versions: GithubVersion[] = [];
     let latestVersion: GithubVersion;
-    if (response.status === 200 && data.length > 0) {
+    const answerSuccess = response.status === 200 && data.length > 0;
+    if (answerSuccess) {
         versions = data.sort((v1, v2) => new SemVer(v2.name).compare(v1.name));
         latestVersion = versions[0];
+        (window as any).githubTagsUpdates[github] = true;
     }
-    (window as any).githubTags[github] = {
-        versions: versions,
-        latestVersion: latestVersion,
-    };
+    if (answerSuccess || (!answerSuccess && (window as any).githubTags[github] == null)) {
+        (window as any).githubTags[github] = {
+            versions: versions,
+            latestVersion: latestVersion,
+        };
+    }
     localStorage.setItem('githubTags', JSON.stringify((window as any).githubTags));
+    localStorage.setItem('githubTagsUpdates', JSON.stringify((window as any).githubTagsUpdates));
 
     return (window as any).githubTags[github];
 }
@@ -43,20 +79,20 @@ export async function getGithubTags(github: string) {
 export async function extractGithubPath(image: IMarketplaceItem) {
     const githubFolder = image.github;
     const githubTags = await getGithubTags(githubFolder);
-    const githubVersion = githubTags.latestVersion?.name ?? image.version;
+    const githubVersion = githubTags.latestVersion?.name;
 
     return { githubFolder, githubVersion };
 }
 
 export async function getGithubLastVersion(image: IMarketplaceItem) {
     const githubTags = await getGithubTags(image.github);
-    const githubVersion = githubTags.latestVersion?.name ?? image.version;
+    const githubVersion = githubTags.latestVersion?.name;
     return githubVersion;
 }
 
 async function getGithubBaseRawUrl(image: IMarketplaceItem) {
     const githubTags = await getGithubTags(image.github);
-    return `https://raw.githubusercontent.com/${image.github}/${githubTags.latestVersion?.name ?? image.version}`;
+    return `https://raw.githubusercontent.com/${image.github}/${githubTags.latestVersion?.name}`;
 }
 
 async function getGithubBaseArchiveUrl(image: IMarketplaceItem) {
