@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 
 interface Props {
     values?: any[];
-    value?: any;
+    value?: any[];
     error?: string;
-    onChange?: (newValue: any) => void;
+    onChange?: (newValue: any[]) => void;
 }
 
-export function MarketplaceItemInstallSelect(props: Props) {
+export function MarketplaceItemInstallMultipleSelect(props: Props) {
     const options = useMemo(() => {
         return (props.values ?? []).map((value: string | number) => {
             const valueString = value.toString();
@@ -21,7 +21,7 @@ export function MarketplaceItemInstallSelect(props: Props) {
     }, [props.values]);
 
     const value = useMemo(() => {
-        return options.find((el) => el.id === props.value) ?? null;
+        return options.filter((el) => props.value.includes(el.id));
     }, [props.value]);
 
     return (
@@ -29,9 +29,11 @@ export function MarketplaceItemInstallSelect(props: Props) {
             <Autocomplete
                 sx={{ maxWidth: '300px' }}
                 fullWidth
+                disableCloseOnSelect
+                multiple
                 value={value}
-                onChange={(e, value) => {
-                    props.onChange && props.onChange(value?.id ?? null);
+                onChange={(e, values) => {
+                    props.onChange && props.onChange(values.map((value) => value.id));
                 }}
                 options={options}
                 renderInput={(params) => <TextField {...params} />}

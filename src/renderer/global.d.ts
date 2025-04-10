@@ -29,7 +29,7 @@ declare global {
     }
 
     interface IProjectWithMarketPlace extends IProject {
-        marketplaceItem: IMarketplaceItem;
+        marketplaceItem?: IMarketplaceItem;
         name: string;
     }
 

@@ -1,5 +1,5 @@
-import { Card, ImageListItem, Stack, Tooltip, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { Card, Chip, ImageListItem, Stack, Tooltip, Typography } from '@mui/material';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { Self } from 'src/renderer/helpers/self';
 
 interface Props {
@@ -39,7 +39,10 @@ export function ProjectItemUserSettingsCard(props: Props) {
                                                 type: userSetting.type,
                                                 target: userSetting.target,
                                                 values: userSetting.values ?? [],
-                                                value: envVars[userSetting.target] ?? null,
+                                                value:
+                                                    userSetting.type === 'multiple-select'
+                                                        ? (envVars[userSetting.target] ?? '').split(',')
+                                                        : (envVars[userSetting.target] ?? null),
                                             });
                                         } else {
                                             formStructure.push(
@@ -100,14 +103,32 @@ export function ProjectItemUserSettingsCard(props: Props) {
         <ImageListItem>
             <Card sx={{ backgroundColor: '#252525', p: '5px', overflow: 'hidden' }}>
                 {formStructure.map((el, index) => {
+                    let content = (
+                        <Tooltip placement='bottom' title={el.value}>
+                            <Typography noWrap minWidth={'50px'}>
+                                {el.value}
+                            </Typography>
+                        </Tooltip>
+                    );
+                    let extraStyle: CSSProperties = {};
+                    if (el.type === 'multiple-select') {
+                        content = el.value.map((value) => (
+                            <Tooltip key={value} placement='bottom' title={value}>
+                                <Chip label={value} size='small' />
+                            </Tooltip>
+                        ));
+                        extraStyle = {
+                            flexWrap: 'wrap',
+                            gap: '2px',
+                        };
+                    }
+
                     return (
                         <CardInfo key={index} title={el.title}>
-                            <div style={{ minWidth: '50px', display: 'flex', justifyContent: 'flex-end' }}>
-                                <Tooltip placement='bottom' title={el.value}>
-                                    <Typography noWrap minWidth={'50px'}>
-                                        {el.value}
-                                    </Typography>
-                                </Tooltip>
+                            <div
+                                style={{ minWidth: '50px', display: 'flex', justifyContent: 'flex-end', ...extraStyle }}
+                            >
+                                {content}
                             </div>
                         </CardInfo>
                     );

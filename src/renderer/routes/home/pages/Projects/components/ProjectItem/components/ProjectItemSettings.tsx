@@ -76,12 +76,13 @@ export function ProjectItemSettings(props: Props) {
     }, [project, containerStatusColor]);
 
     useEffect(() => {
-        getGithubLastVersion(project.marketplaceItem).then((githubVersion) => {
-            if (projectRef.current?.domain !== project.domain) {
-                return;
-            }
-            setLastVersion(githubVersion);
-        });
+        project.marketplaceItem &&
+            getGithubLastVersion(project.marketplaceItem).then((githubVersion) => {
+                if (projectRef.current?.domain !== project.domain) {
+                    return;
+                }
+                setLastVersion(githubVersion);
+            });
     }, [project]);
 
     return (

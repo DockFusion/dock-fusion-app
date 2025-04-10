@@ -22,6 +22,9 @@ export function getDefaultValue(type: string) {
         case 'checkbox':
             return false;
 
+        case 'multiple-select':
+            return [];
+
         case 'path-select':
         case 'project-label':
         case 'domain':
@@ -153,6 +156,7 @@ export function MarketplaceItemInstall(props: Props) {
 
                 case 'checkbox':
                 case 'switch':
+                case 'multiple-select':
                     break;
 
                 case 'db-credentials':

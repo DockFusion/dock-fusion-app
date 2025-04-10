@@ -54,6 +54,9 @@ export function ProjectItemEditForm(props: Props) {
                     }
                     return getDefaultValue(type);
 
+                case 'multiple-select':
+                    return (envVars[target] ?? '').split(',');
+
                 default:
                     return envVars[target] ?? getDefaultValue(type);
             }
@@ -161,6 +164,7 @@ export function ProjectItemEditForm(props: Props) {
             switch (structure.type) {
                 case 'checkbox':
                 case 'switch':
+                case 'multiple-select':
                     break;
 
                 case 'db-credentials':

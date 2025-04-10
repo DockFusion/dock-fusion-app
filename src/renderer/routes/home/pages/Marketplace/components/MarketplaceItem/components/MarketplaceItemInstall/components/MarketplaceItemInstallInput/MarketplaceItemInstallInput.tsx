@@ -1,9 +1,12 @@
 import { Typography } from '@mui/material';
+import { MarketplaceItemInstallCheckbox } from '../MarketplaceItemInstallCheckbox/MarketplaceItemInstallCheckbox';
 import { MarketplaceItemInstallDbCredentials } from '../MarketplaceItemInstallDbCredentials/MarketplaceItemInstallDbCredentials';
 import { MarketplaceItemInstallDomain } from '../MarketplaceItemInstallDomain/MarketplaceItemInstallDomain';
 import { MarketplaceItemInstallHorizontalRadio } from '../MarketplaceItemInstallHorizontalRadio/MarketplaceItemInstallHorizontalRadio';
+import { MarketplaceItemInstallMultipleSelect } from '../MarketplaceItemInstallMultipleSelect/MarketplaceItemInstallMultipleSelect';
 import { MarketplaceItemInstallPathSelect } from '../MarketplaceItemInstallPathSelect/MarketplaceItemInstallPathSelect';
 import { MarketplaceItemInstallProjectLabel } from '../MarketplaceItemInstallProjectLabel/MarketplaceItemInstallProjectLabel';
+import { MarketplaceItemInstallSelect } from '../MarketplaceItemInstallSelect/MarketplaceItemInstallSelect';
 import { MarketplaceItemInstallSwitch } from '../MarketplaceItemInstallSwitch/MarketplaceItemInstallSwitch';
 
 interface Props {
@@ -39,7 +42,24 @@ export function MarketplaceItemInstallInput(props: Props) {
             );
 
         case 'select':
-        // return <MarketplaceItemInstallSelect values={props.values}  value={props.value} error={props.error}  onChange={props.onChange}/>;
+            return (
+                <MarketplaceItemInstallSelect
+                    values={props.values}
+                    value={props.value}
+                    error={props.error}
+                    onChange={props.onChange}
+                />
+            );
+
+        case 'multiple-select':
+            return (
+                <MarketplaceItemInstallMultipleSelect
+                    values={props.values}
+                    value={props.value}
+                    error={props.error}
+                    onChange={props.onChange}
+                />
+            );
 
         case 'horizontal-radio':
             return (
@@ -63,7 +83,7 @@ export function MarketplaceItemInstallInput(props: Props) {
             );
 
         case 'checkbox':
-        // return <MarketplaceItemInstallCheckbox  value={props.value} error={props.error}  onChange={props.onChange}/>;
+            return <MarketplaceItemInstallCheckbox value={props.value} error={props.error} onChange={props.onChange} />;
 
         case 'switch':
             return <MarketplaceItemInstallSwitch value={props.value} error={props.error} onChange={props.onChange} />;

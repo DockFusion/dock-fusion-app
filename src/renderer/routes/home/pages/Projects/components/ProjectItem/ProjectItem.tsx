@@ -85,12 +85,13 @@ export function ProjectItem(props: Props) {
             }
             setLogoUrl(res);
         });
-        getGithubLastVersion(project.marketplaceItem).then((githubVersion) => {
-            if (projectRef.current?.domain !== project.domain) {
-                return;
-            }
-            setLastVersion(githubVersion);
-        });
+        project.marketplaceItem &&
+            getGithubLastVersion(project.marketplaceItem).then((githubVersion) => {
+                if (projectRef.current?.domain !== project.domain) {
+                    return;
+                }
+                setLastVersion(githubVersion);
+            });
         setLoaderVisible(false);
 
         return () => {

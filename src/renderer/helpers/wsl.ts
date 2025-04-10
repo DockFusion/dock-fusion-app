@@ -4,19 +4,19 @@ import { Windows } from './windows';
 
 export const WSL = {
     getStatus: async () => {
-        return await window.electron.wsl.getStatus();
+        return await window.electron?.wsl.getStatus();
     },
     getDistributions: async () => {
-        return await window.electron.wsl.getDistributions();
+        return await window.electron?.wsl.getDistributions();
     },
     install: async () => {
-        return await window.electron.wsl.install();
+        return await window.electron?.wsl.install();
     },
     setDefault: async (distribution: string) => {
-        return await window.electron.wsl.setDefault(distribution);
+        return await window.electron?.wsl.setDefault(distribution);
     },
     import: async (distributionName: string, distributionPath: string, fileToImportPath: string) => {
-        return await window.electron.wsl.import(distributionName, distributionPath, fileToImportPath);
+        return await window.electron?.wsl.import(distributionName, distributionPath, fileToImportPath);
     },
     openInstallationDocs: async () => {
         const buildVersion = await Windows.getBuildNumber();

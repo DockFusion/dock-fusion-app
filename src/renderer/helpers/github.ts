@@ -4,10 +4,10 @@ import { IMarketplaceItem, IProject } from 'src/shared/interfaces';
 
 export const Github = {
     downloadMarketplaceFile: async (downloadUrl: string, github: string, filePath: string) => {
-        return await window.electron.github.downloadMarketplaceFile(downloadUrl, github, filePath);
+        return await window.electron?.github.downloadMarketplaceFile(downloadUrl, github, filePath);
     },
     readMarketplaceFile: async (github: string, filePath: string) => {
-        return await window.electron.github.readMarketplaceFile(github, filePath);
+        return await window.electron?.github.readMarketplaceFile(github, filePath);
     },
 };
 
