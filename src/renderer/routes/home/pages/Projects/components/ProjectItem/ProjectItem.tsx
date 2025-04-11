@@ -208,14 +208,21 @@ export function ProjectItem(props: Props) {
                                 </Button>
                             )}
                         </Stack>
-                        <Stack direction={'row'} gap={'10px'}>
-                            <a href={`https://github.com/${project.marketplaceItem.github}/issues/new`} target='_blank'>
-                                Report an issue
-                            </a>
-                            <a href={`https://github.com/${project.marketplaceItem.github}`} target='_blank'>
-                                Github
-                            </a>
-                        </Stack>
+                        {project.marketplaceItem ? (
+                            <Stack direction={'row'} gap={'10px'}>
+                                <a
+                                    href={`https://github.com/${project.marketplaceItem.github}/issues/new`}
+                                    target='_blank'
+                                >
+                                    Report an issue
+                                </a>
+                                <a href={`https://github.com/${project.marketplaceItem.github}`} target='_blank'>
+                                    Github
+                                </a>
+                            </Stack>
+                        ) : (
+                            <></>
+                        )}
                     </Stack>
                     <div style={{ width: '10px' }}></div>
                     <Stack direction={'column'} alignItems={'flex-start'} height={'100%'}>

@@ -355,6 +355,7 @@ export async function startProject(_: any, project: IProject, forceRebuild: bool
         const env = (await readEnvFile(path.join(appDataPath, '.env'))) ?? {};
 
         env.DATA_PATH_HOST = dataPath;
+        env.CONTAINER_PREFIX = `${dockerGroupName}-${project.domain}`;
 
         //setup fresh free ports
         let freePort = 7999;
