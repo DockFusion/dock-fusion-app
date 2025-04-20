@@ -23,6 +23,9 @@ export function ProjectItemMainInfoCard(props: Props) {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (!props.project) {
+            return;
+        }
         Self.getEnvironmentByProject(props.project).then((envVars) => {
             setAppPath(envVars.APP_CODE_PATH_HOST ?? '');
             setAppDataPath('');
@@ -39,20 +42,24 @@ export function ProjectItemMainInfoCard(props: Props) {
     return (
         <ImageListItem>
             <Card sx={{ backgroundColor: '#252525', p: '5px', overflow: 'hidden' }}>
-                <CardInfo title={'Stack'}>
-                    <Tooltip
-                        placement='bottom'
-                        title={props.project.marketplaceItem.name}
-                        onClick={() => {
-                            navigate(`/home/marketplace/${props.project.marketplaceItem.id}`);
-                        }}
-                        style={{
-                            cursor: 'pointer',
-                        }}
-                    >
-                        <Typography noWrap>{props.project.marketplaceItem.name}</Typography>
-                    </Tooltip>
-                </CardInfo>
+                {props.project.marketplaceItem ? (
+                    <CardInfo title={'Stack'}>
+                        <Tooltip
+                            placement='bottom'
+                            title={props.project.marketplaceItem.name}
+                            onClick={() => {
+                                navigate(`/home/marketplace/${props.project.marketplaceItem.id}`);
+                            }}
+                            style={{
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <Typography noWrap>{props.project.marketplaceItem.name}</Typography>
+                        </Tooltip>
+                    </CardInfo>
+                ) : (
+                    <></>
+                )}
                 <CardInfo title={'Host'}>
                     <Tooltip
                         placement='bottom'

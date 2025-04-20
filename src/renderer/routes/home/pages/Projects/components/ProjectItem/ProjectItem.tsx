@@ -59,6 +59,9 @@ export function ProjectItem(props: Props) {
     containerStatusRef.current = containerStatus;
 
     useEffect(() => {
+        if (!project) {
+            return;
+        }
         Self.doesExistAtProject(project, 'needRebuild').then((res) => {
             if (projectRef.current?.domain !== project.domain) {
                 return;
@@ -175,7 +178,13 @@ export function ProjectItem(props: Props) {
                                             variant: 'info',
                                         });
                                         setContainerStatusByProject(project.domain, ProjectStatus.starting);
-                                        Self.startProject(project);
+                                        Self.startProject(project).catch((e) => {
+                                            console.error(e);
+                                            enqueueSnackbar(`[${project.name}] an error has occurred`, {
+                                                variant: 'error',
+                                            });
+                                            setContainerStatusByProject(project.domain, ProjectStatus.error);
+                                        });
                                     }}
                                     variant='contained'
                                     style={{

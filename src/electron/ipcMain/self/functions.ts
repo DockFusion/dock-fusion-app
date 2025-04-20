@@ -337,8 +337,7 @@ export async function readProjectFile(_: any, project: IProject, filePath: strin
 }
 
 export async function startProject(_: any, project: IProject, forceRebuild: boolean = false): Promise<void> {
-    const position = currentStartPosition;
-    currentStartPosition++;
+    const position = currentStartPosition++;
     while (processingPosition < position) {
         await sleep(500);
     }
@@ -407,8 +406,7 @@ export async function startProject(_: any, project: IProject, forceRebuild: bool
             fs.rmSync(path.join(appDataPath, 'needRebuild'));
         }
 
-        processingPosition++;
-        return new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             exec(
                 `docker compose -p ${dockerGroupName}-${project.domain} up ${forceRebuild || needRebuild ? ' --build' : ''} -d`,
                 { cwd: appDataPath },
@@ -427,6 +425,7 @@ export async function startProject(_: any, project: IProject, forceRebuild: bool
                 },
             );
         });
+        processingPosition++;
     } catch (e) {
         processingPosition++;
         throw e;

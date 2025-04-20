@@ -212,7 +212,13 @@ export function ProjectItemEditForm(props: Props) {
                 enqueueSnackbar(`${project.name} app edited with success.`, {
                     variant: 'success',
                 });
-                // Self.startProject(project, true);
+                // Self.startProject(project, true).catch((e) => {
+                //     console.error(e);
+                //     enqueueSnackbar(`[${project.name}] an error has occurred`, {
+                //         variant: 'error',
+                //     });
+                //     setContainerStatusByProject(project.domain, ProjectStatus.error);
+                // });
                 refreshProjects().then(() => {
                     navigate(`/home/projects/${project.domain}`);
                 });

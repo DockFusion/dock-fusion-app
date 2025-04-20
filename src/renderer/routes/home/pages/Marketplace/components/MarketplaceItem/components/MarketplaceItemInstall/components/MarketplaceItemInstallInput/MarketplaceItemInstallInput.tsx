@@ -8,6 +8,7 @@ import { MarketplaceItemInstallPathSelect } from '../MarketplaceItemInstallPathS
 import { MarketplaceItemInstallProjectLabel } from '../MarketplaceItemInstallProjectLabel/MarketplaceItemInstallProjectLabel';
 import { MarketplaceItemInstallSelect } from '../MarketplaceItemInstallSelect/MarketplaceItemInstallSelect';
 import { MarketplaceItemInstallSwitch } from '../MarketplaceItemInstallSwitch/MarketplaceItemInstallSwitch';
+import { MarketplaceItemInstallTextInput } from '../MarketplaceItemInstallTextInput/MarketplaceItemInstallProjectLabel';
 
 interface Props {
     type: string;
@@ -87,6 +88,11 @@ export function MarketplaceItemInstallInput(props: Props) {
 
         case 'switch':
             return <MarketplaceItemInstallSwitch value={props.value} error={props.error} onChange={props.onChange} />;
+
+        case 'text-input':
+            return (
+                <MarketplaceItemInstallTextInput value={props.value} error={props.error} onChange={props.onChange} />
+            );
 
         default:
             return (

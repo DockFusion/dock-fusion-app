@@ -253,7 +253,13 @@ export function ProjectItemSettings(props: Props) {
                                 variant: 'info',
                             });
                             setContainerStatusByProject(project.domain, ProjectStatus.starting);
-                            Self.startProject(project);
+                            Self.startProject(project).catch((e) => {
+                                console.error(e);
+                                enqueueSnackbar(`[${project.name}] an error has occurred`, {
+                                    variant: 'error',
+                                });
+                                setContainerStatusByProject(project.domain, ProjectStatus.error);
+                            });
                         }}
                         disabled={containerStatus === ProjectStatus.starting}
                     >
@@ -307,7 +313,13 @@ export function ProjectItemSettings(props: Props) {
                             variant: 'info',
                         });
                         setContainerStatusByProject(project.domain, ProjectStatus.stopping);
-                        Self.startProject(project, true);
+                        Self.startProject(project, true).catch((e) => {
+                            console.error(e);
+                            enqueueSnackbar(`[${project.name}] an error has occurred`, {
+                                variant: 'error',
+                            });
+                            setContainerStatusByProject(project.domain, ProjectStatus.error);
+                        });
                     }}
                     disabled={
                         ![ProjectStatus.running, ProjectStatus.unknown, ProjectStatus.paused].includes(containerStatus)
